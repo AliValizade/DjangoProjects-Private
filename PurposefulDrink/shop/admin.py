@@ -1,3 +1,32 @@
 from django.contrib import admin
 
-# Register your models here.
+
+from . import models
+
+
+class SuitabilityInline(admin.TabularInline):
+    model = models.Suitability
+    fields = ['disease', 'score']
+    extra = 3 
+
+
+@admin.register(models.Herb)
+class HerbAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'temperament', 'suitable_season', 'age_group', ]
+    inlines = [SuitabilityInline]  
+
+
+
+@admin.register(models.Disease)
+class DiseaseAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', ]
+
+
+@admin.register(models.Suitability)
+class SuitabilityAdmin(admin.ModelAdmin):
+    list_display = ['id', 'herb', 'disease', 'score', ]
+
+
+@admin.register(models.NeutralPackage)
+class NeutralAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', ]
