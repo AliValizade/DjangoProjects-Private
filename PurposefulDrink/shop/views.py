@@ -1,11 +1,20 @@
+from django.views import View
 from django.shortcuts import render
 from .models import Herb, Disease, Suitability, NeutralPackage
 
 from .forms import DiseaseForm
 
-def recommend_herbs(request):
-    if request.method == 'POST':
-        form = DiseaseForm(request.POST)
+class RecommendHerbsView(View):
+    form_class = DiseaseForm
+    template_name = 'shop/index.html'
+    success_template_name = 'shop/recommend.html'
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
         if form.is_valid():
             selected_diseases = form.cleaned_data['diseases']
             herbs = Herb.objects.all()
@@ -24,12 +33,9 @@ def recommend_herbs(request):
             # Create a list of descriptions for forbidden herbs
             forbidden_list = [(herb.name, ', '.join([disease.name for disease in selected_diseases if herb.is_forbidden([disease])])) for herb in forbidden_herbs]
 
-            return render(request, 'shop/recommend.html', {
+            return render(request, self.success_template_name, {
                 'recommendations': recommendations,
                 'neutral_packages': neutral_packages,
                 'forbidden_list': forbidden_list
             })
-    else:
-        form = DiseaseForm()
-
-    return render(request, 'shop/index.html', {'form': form})
+        return render(request, self.template_name, {'form': form})
