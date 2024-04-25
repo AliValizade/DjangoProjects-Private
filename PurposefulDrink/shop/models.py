@@ -1,25 +1,27 @@
 from django.db import models
 from django.db.models import Sum
 
+
 class Disease(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self) -> str:
         return self.name
 
+
 class Herb(models.Model):
     name = models.CharField(max_length=100)
     
     # Choose a category (cold or warm)
-    TEMPERATURE_CHOICES = [
+    TEMPERAMENT_CHOICES = [
         ('COLD', 'Cold'),
         ('HOT', 'Hot'),
     ]
-    temperature = models.CharField(
+    temperament = models.CharField(
         max_length=10,
-        choices=TEMPERATURE_CHOICES,
+        choices=TEMPERAMENT_CHOICES,
         default='COLD',
-        help_text='Select the temperature category of the herb.'
+        help_text='Select the temperament category of the herb.'
     )
 
     # Choose the right season
