@@ -1,0 +1,36 @@
+{% extends "_base.html" %}
+
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    
+    {% trans "SignUp" as header_name %}
+    {% trans "SignUp" as page_name %}
+    {% include "header_name.html" with header_name=header_name page_name=page_name %}
+
+    <!-- Start SignUP Area -->
+    <section class="signup-area ptb-100">
+        <div class="container">
+            <div class="signup-content">
+                <h2>{% trans "Create an Account" %}</h2>
+
+                <form class="signup-form" action="#" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ form|crispy }}
+                        </div>
+                    <button type="submit" class="default-btn">{% trans "Signup" %}</button>
+
+                    <a href="{% url "home" %}" class="return-store">{% trans "or Return to Store" %}</a>
+                </form>
+            </div>
+        </div>
+    </section>
+    <!-- End SignUP Area -->
+
+{% endblock content %}
+
+
+

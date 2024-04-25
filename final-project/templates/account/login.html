@@ -1,0 +1,48 @@
+{% extends "_base.html" %}
+
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+  
+    <!-- Start Page Title -->
+    {% trans "Login" as header_name %}
+    {% trans "Login" as page_name %}
+    {% include "header_name.html" with header_name=header_name page_name=page_name %}
+
+    <!-- Start Login Area -->
+    <section class="login-area ptb-100">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div class="login-content">
+                        <h2>{% trans "Login" %}</h2>
+
+                        <form class="login-form" action="" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                {{ form|crispy }}
+                            </div>
+                            <button type="submit" class="default-btn">{% trans "Login" %}</button>
+                            <a href="#" class="forgot-password">{% trans "Lost your password?" %}</a>
+                        </form>
+
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6">
+                    <div class="new-customer-content">
+                        <h2>{% trans "New Customer" %}</h2>
+
+                        <span>{% trans "Create A Account" %}</span>
+                        <p>{% trans "Sign up for a free account at our store. Registration is quick and easy. It allows you to be able to order from our shop. To start shopping click register." %}</p>
+                        <a href="{% url "account_signup" %}" class="optional-btn">{% trans "Create A Account" %}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Login Area -->
+
+{% endblock content %}

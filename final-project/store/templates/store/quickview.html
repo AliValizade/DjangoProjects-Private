@@ -1,0 +1,90 @@
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load persian_translation_tags %}
+
+<!-- Start QuickView Modal Area -->
+<div class="modal fade productsQuickView" id="productsQuickView{{ product.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true"><i class='bx bx-x'></i></span>
+            </button>
+
+            <div class="row align-items-center">
+                <div class="col-lg-6 col-md-6">
+                    <div class="products-image">
+                        <img src="{{product.image.url}}" alt="image">
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6">
+                    <div class="products-content">
+                        <h3><a href="{{product.get_absolute_url}}">{{product.name}} </a></h3>
+
+                        <div class="price">
+                            <span class="old-price">{{product.price|translate_number}} {% trans "$" %} </span>
+                            <span class="new-price">{{product.price|translate_number}} {% trans "$" %}</span>
+                        </div>
+
+                        <div class="products-review">
+                            <div class="rating">
+                                <span>{% trans "Score" %}: 
+                                    {% for ـ in product.average_rating %}
+                                        <i class='bx bxs-star'></i>
+                                    {% endfor %}
+                                </span>
+                            </div>
+                            <p><div class="rating"> {% trans "reviews" %}&nbsp;&nbsp;&nbsp;({{ product.comments.count|translate_number }})</div></p>
+                        </div>
+
+                        <ul class="products-info">
+                            <li><span>{% trans "Vendor:" %}</span> <a href="#">{% trans "Lereve" %}</a></li>
+                            <li><span>{% trans "Availability:" %}</span> <a href="#">{% trans "In stock" %} ({{product.inventory|translate_number}} {% trans "items" %})</a></li>
+                            <li><span>{% trans "Products Type:" %}</span> <a href="#">{% trans "T-Shirt" %}</a></li>
+                        </ul>
+
+                        <div class="products-color-switch">
+                            <h4>{% trans "Color:" %}</h4>
+
+                            <ul>
+                                <li><a href="#" data-bs-toggle="tooltip" data-placement="top" title="Black" class="color-black"></a></li>
+                                <li><a href="#" data-bs-toggle="tooltip" data-placement="top" title="White" class="color-white"></a></li>
+                                <li><a href="#" data-bs-toggle="tooltip" data-placement="top" title="Green" class="color-green"></a></li>
+                                <li><a href="#" data-bs-toggle="tooltip" data-placement="top" title="Yellow Green" class="color-yellowgreen"></a></li>
+                                <li><a href="#" data-bs-toggle="tooltip" data-placement="top" title="Teal" class="color-teal"></a></li>
+                            </ul>
+                        </div>
+
+                        <div class="products-size-wrapper">
+                            <h4>{% trans "Size:" %}</h4>
+
+                            <ul>
+                                <li><a href="#">XS</a></li>
+                                <li class="active"><a href="#">S</a></li>
+                                <li><a href="#">M</a></li>
+                                <li><a href="#">XL</a></li>
+                                <li><a href="#">XXL</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="products-add-to-cart">
+                            <form action="{% url "cart_add" product.id %}" method="POST">
+                                {% csrf_token %}
+                                <div class="input-counter">
+                                    <span class="minus-btn"><i class='bx bx-minus'></i></span>
+                                    <input type="text" name="quantity" value="1">
+                                    <span class="plus-btn"><i class='bx bx-plus'></i></span>
+                                </div>                            
+                                <button type="submit" class="default-btn"><i class="fas fa-cart-plus"></i>{% trans "Add to Cart " %}</button>
+                            </form>
+                        </div>
+
+                        <a href="{{product.get_absolute_url}}" class="view-full-info">{% trans "View Full Info" %}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End QuickView Modal Area -->

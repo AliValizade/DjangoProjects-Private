@@ -1,0 +1,27 @@
+{% extends "_base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    
+    <!-- Start Page Title -->
+    {% trans "My Account" as header_name %}
+    {% trans "MyAccount" as page_name %}
+    {% include "header_name.html" with header_name=header_name page_name=page_name %}
+
+    <!-- Start Account Area -->
+    <section class="signup-area ptb-100">
+        <div class="container">
+            <div class="signup-content">
+                <h2>My Account</h2>
+                <p>my account</p>
+            </div>
+        </div>
+    </section>
+    <!-- End Account Area -->
+
+{% endblock content %}
+
+
+

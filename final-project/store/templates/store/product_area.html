@@ -1,0 +1,162 @@
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load persian_translation_tags %}
+{% load humanize %}
+
+<!-- Start Products Area -->
+<section class="products-area pb-70">
+    <div class="container">
+        <div class="row">
+            <!-- Start Right_bar filter Area -->
+            {% include "store/product_filter.html" %}
+            <!-- End Right_bar filter Area -->
+
+            <div class="col-lg-8 col-md-12">
+                <div class="products-filter-options">
+                    <div class="row align-items-center">
+                        <div class="col-lg-4 col-md-4">
+                            <div class="d-lg-flex d-md-flex align-items-center">
+                                <span class="sub-title d-lg-none"><a href="#" data-bs-toggle="modal" data-bs-target="#productsFilterModal"><i class='bx bx-filter-alt'></i> {% trans "Filter" %}</a></span>
+                                
+                                <span class="sub-title d-none d-lg-block d-md-block">{% trans "View:" %}</span>
+
+                                <div class="view-list-row d-none d-lg-block d-md-block">
+                                    <div class="view-column">
+                                        <a href="#" class="icon-view-one">
+                                            <span></span>
+                                        </a>
+
+                                        <a href="#" class="icon-view-two active">
+                                            <span></span>
+                                            <span></span>
+                                        </a>
+
+                                        <a href="#" class="icon-view-three">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </a>
+
+                                        <a href="#" class="view-grid-switch">
+                                            <span></span>
+                                            <span></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4">
+                            <p>{% trans "Showing" %} 1 – 18 {% trans "of" %} 100</p>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4">
+                            <div class="products-ordering-list">
+                                <select>
+                                    <option>{% trans "Sort by Price: Low to High" %}</option>
+                                    <option>{% trans "Default Sorting" %}</option>
+                                    <option>{% trans "Sort by Popularity" %}</option>
+                                    <option>{% trans "Sort by Average Rating" %}</option>
+                                    <option>{% trans "Sort by Latest" %}</option>
+                                    <option>{% trans "Sort by Price: High to Low" %}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="products-collections-filter" class="row">
+                    {% for product in products %}
+                        <div class="col-lg-6 col-md-6 col-sm-6 products-col-item">
+                            <div class="products-box">
+                                <div class="products-image">
+                                    <a href="{{ product.get_absolute_url }}">
+
+                                        {% if product.main_image %}
+                                            <img src="{{ product.main_image.image.url }}" class="main-image" alt="{{ product.name }}">
+                                            <img src="{{ product.main_image.image.url }}" class="hover-image" alt="{{ product.name }}">
+                                        {% endif %}
+            
+                                    </a>
+
+                                    <div class="products-button">
+                                        <ul>
+                                            <li>
+                                                <div class="wishlist-btn">
+                                                    <a href="{% url 'add_to_wishlist' product_id=product.id %}">
+                                                        <i class='bx bx-heart'></i>
+                                                        <span class="tooltip-label">{% trans "Add to Wishlist" %}</span>
+                                                    </a>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="compare-btn">
+                                                    <a href="#">
+                                                        <i class='bx bx-refresh'></i>
+                                                        <span class="tooltip-label">{% trans "Compare" %}</span>
+                                                    </a>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="quick-view-btn">
+                                                    <a href="{{ product.get_absolute_url }}" data-bs-toggle="modal" data-bs-target="#productsQuickView{{ product.id }}">
+                                                        <i class='bx bx-search-alt'></i>
+                                                        <span class="tooltip-label">{% trans "Quick View" %}</span>
+                                                    </a>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="new-tag">{{ label }}</div>
+                                </div>
+
+                                <div class="products-content">
+                                    <span class="category">{{ product.category }}</span>
+                                    <h3><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3>
+                                    <div class="star-rating">
+                                        <span>{% trans "Score" %}: 
+                                        {% for ـ in product.average_rating %}
+                                            <i class='bx bxs-star'></i>
+                                        {% endfor %}
+                                        </span>
+                                    </div>
+                                    <div class="price">
+                                        <span class="old-price">{{ product.price|intcomma:False|translate_number }} {% trans "$" %}</span>&nbsp;&nbsp;
+                                        <span class="new-price">{{ product.price|intcomma:False|translate_number }} {% trans "$" %}</span>
+                                    </div>
+                                    <form action="{% url "cart_add" product.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="default-btn"><i class="add-to-cart"></i>{% trans "Add to Cart " %}</button>                        
+                                    </form>
+                                </div>
+
+                                <span class="products-discount">
+                                    {% if label == "New" %}
+                                    <span>
+                                        20% {% trans "OFF" %}
+                                    </span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <!-- QuickView Modal Area -->
+                        {% include "store/quickview.html" with product=product %}
+                    {% endfor %}
+                </div>
+
+                <div class="pagination-area text-center">
+                    <a href="#" class="prev page-numbers"><i class='bx bx-chevron-left'></i></a>
+                    <span class="page-numbers current" aria-current="page">1</span>
+                    <a href="#" class="page-numbers">2</a>
+                    <a href="#" class="page-numbers">3</a>
+                    <a href="#" class="page-numbers">4</a>
+                    <a href="#" class="page-numbers">5</a>
+                    <a href="#" class="next page-numbers"><i class='bx bx-chevron-right'></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Products Area -->

@@ -1,0 +1,54 @@
+{% extends "_base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+
+    <!-- Start Page Title -->
+    {% trans "Blog" as header_name %}
+    {% trans "Blog" as page_name %}
+    {% include "header_name.html" with header_name=header_name page_name=page_name %}
+
+    <!-- Start Blog Area -->
+    <section class="blog-area ptb-100">
+        <div class="container">
+            <div class="row">
+                {% for post in posts_list %}
+                <div class="col-lg-6 col-md-6">
+                    <div class="single-blog-post">
+                        <div class="post-image">
+                            <a href="#">
+                                <img src="{{post.image.url}}" alt="image">
+                            </a>
+                            <div class="date">
+                                <span>{{ post.datetime_created }}</span>
+                            </div>
+                        </div>
+
+                        <div class="post-content">
+                            <span class="category">{{post.title}}</span>
+                            <h3><a href="#">{{post.post}}</a></h3>
+                            <a href="#" class="details-btn">{% trans "Read Story" %}</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="pagination-area text-center">
+                        <a href="#" class="prev page-numbers"><i class='bx bx-chevron-left'></i></a>
+                        <span class="page-numbers current" aria-current="page">1</span>
+                        <a href="#" class="page-numbers">2</a>
+                        <a href="#" class="page-numbers">3</a>
+                        <a href="#" class="page-numbers">4</a>
+                        <a href="#" class="page-numbers">5</a>
+                        <a href="#" class="next page-numbers"><i class='bx bx-chevron-right'></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Blog Area -->
+
+{% endblock content %}

@@ -1,0 +1,20 @@
+{% extends "_base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    
+<!-- Start Page Title -->
+{% trans "New Products" as header_name %}
+{% trans "products" as page_name %}
+{% include "header_name.html" with header_name=header_name page_name=page_name %}
+
+<!-- Categories Banner Area -->
+{% include "store/category_area.html" %}
+
+<!-- Products Area -->
+{% trans "New" as label %}
+{% include 'store/product_area.html' with products=new_products label=label %}
+
+{% endblock content %}

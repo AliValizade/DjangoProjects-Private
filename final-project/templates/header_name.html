@@ -1,0 +1,16 @@
+{% load static %}
+{% load i18n %}
+
+<!-- Start Page Title -->
+<div class="page-title-area">
+    <div class="container">
+        <div class="page-title-content">
+            <h2>{{header_name}}</h2>
+            <ul>
+                <li><a href="{% static "home" %}">{% trans "Home" %}</a></li>
+                <li>{{page_name}}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- End Page Title -->

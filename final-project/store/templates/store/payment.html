@@ -1,0 +1,26 @@
+{% extends "_base.html" %}
+
+{% load jalali_tags %}
+{% load static %}
+{% load i18n %}
+{% load persian_translation_tags %}
+{% load humanize %}
+
+{% block content %}
+
+    <!-- Start Page Title -->
+    {% trans "Payment verify" as header_name %}
+    {% trans "Payment" as page_name %}
+    {% include "header_name.html" with header_name=header_name page_name=page_name %}
+
+    <!-- Start Checkout Area -->
+    <section class="checkout-area ptb-100">
+        <div class="container">
+            {% if tracking_code %}
+                <p>{% trans "Tracking Code:" %} {{ tracking_code }}</p>
+            {% endif %}
+        </div>
+    </section>
+    <!-- End Checkout Area -->
+
+{% endblock content %}

@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+django-debug-toolbar = "*"
+mysqlclient = "*"
+django-crispy-forms = "*"
+crispy-bootstrap4 = "*"
+django-allauth = "*"
+django-environ = "*"
+environs = {extras = ["django"], version = "*"}
+crispy-bootstrap5 = "*"
+django-rosetta = "*"
+pillow = "*"
+django-jalali-date = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"

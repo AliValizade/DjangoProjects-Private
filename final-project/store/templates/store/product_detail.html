@@ -1,0 +1,356 @@
+{% extends "_base.html" %}
+
+{% load jalali_tags %}
+{% load persian_translation_tags %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% load humanize %}
+
+{% block content %}
+    
+<!-- Start Page Title -->
+{% trans "Product details" as page_name %}
+{% include "header_name.html" with header_name=product.name page_name=page_name %}
+
+<!-- Start Product Details Area -->
+<section class="product-details-area pt-100 pb-70">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-5 col-md-12">
+                <div class="products-details-image">
+                    <ul class="products-details-image-slides">
+                        {% if product.images %}
+                            {% for image in product.images.all %}
+                                <li><img src="{{ image.image.url }}" alt="image"></li>
+                            {% endfor %}
+                      
+                        {% endif %}
+                    </ul>
+
+                    <div class="slick-thumbs">
+                        <ul>
+                            {% if product.images %}
+                                {% for image in product.images.all %}
+                                    <li><img src="{{ image.image.url }}" alt="image"></li>
+                                {% endfor %}
+                       
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7 col-md-12">
+                <div class="products-details-desc">
+                    <h3>{{ product.name }}</h3>
+
+                    <div class="price">
+                        <span class="new-price">{{ product.price|intcomma:False|translate_number }} {% trans "$" %} &nbsp;&nbsp;&nbsp;</span>
+                        <span class="old-price">{{ product.price|intcomma:False|translate_number }} {% trans "$" %}</span>
+                    </div>
+
+                    <div class="products-review">
+                        <div class="rating">
+                            <div>{% trans "Score" %}:&nbsp;&nbsp;
+                            {% for ـ in product.average_rating %}
+                                <i class='bx bxs-star'></i>
+                            {% endfor %}
+                            </div>
+                        </div>
+                        <p><div class="rating"> {% trans "reviews" %}&nbsp;&nbsp;&nbsp;({{ product.comments.count|translate_number }})  </div></p>
+                    </div>
+
+                    <ul class="products-info">
+                        <li><span>{% trans "Vendor:" %}</span> <a href="#"> &nbsp;&nbsp; {% trans "Lereve" %}</a></li>
+                        <li><span>{% trans "Availability:" %}</span> <a href="#"> &nbsp;&nbsp;{% trans "In stock" %} ({{ product.inventory|translate_number }} {% trans "items" %})</a></li>
+                        <li><span>{% trans "Products Type:" %}</span> <a href="#"> &nbsp;&nbsp;{{ product.category }}</a></li>
+                    </ul>
+
+                    <div class="products-color-switch">
+                        <span>{% trans "Color:" %}</span>
+
+                        <ul>
+                            <li><a href="#" title="Black" class="color-black"></a></li>
+                            <li><a href="#" title="White" class="color-white"></a></li>
+                            <li class="active"><a href="#" title="Green" class="color-green"></a></li>
+                            <li><a href="#" title="Yellow Green" class="color-yellowgreen"></a></li>
+                            <li><a href="#" title="Teal" class="color-teal"></a></li>
+                        </ul>
+                    </div>
+
+                    <div class="products-size-wrapper">
+                        <span>{% trans "Size:" %}</span>
+
+                        <ul>
+                            <li><a href="#">XS</a></li>
+                            <li class="active"><a href="#">S</a></li>
+                            <li><a href="#">M</a></li>
+                            <li><a href="#">XL</a></li>
+                            <li><a href="#">XXL</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="products-info-btn">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#sizeGuideModal"><i class='bx bx-crop'></i>{% trans "Size guide" %}</a>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#productsShippingModal"><i class='bx bxs-truck' ></i>{% trans "Shipping" %}</a>
+                        <a href="contact.html"><i class='bx bx-envelope'></i>{% trans "Ask about this products" %}</a>
+                    </div>
+
+                    <div class="products-add-to-cart">
+                        <form action="{% url "cart_add" product.id %}" method="POST">
+                            {% csrf_token %}
+                            <div class="input-counter">
+                                <span class="minus-btn"><i class='bx bx-minus'></i></span>
+                                <input type="text" name="quantity" value="1">
+                                <span class="plus-btn"><i class='bx bx-plus'></i></span>
+                            </div>                            
+                            <button type="submit" class="default-btn"><i class="fas fa-cart-plus"></i>{% trans "Add to Cart " %}</button>
+                        </form>
+
+                    </div>
+
+                    <div class="wishlist-compare-btn">
+                        <a href="#" class="optional-btn"><i class='bx bx-heart'></i> {% trans "Add to Wishlist" %}</a>
+                        <a href="#" class="optional-btn"><i class='bx bx-refresh'></i> {% trans "Add to Compare" %}</a>
+                    </div>
+
+                    <div class="buy-checkbox-btn">
+                        <div class="item">
+                            <input class="inp-cbx" id="cbx" type="checkbox">
+                            <label class="cbx" for="cbx">
+                                <span>
+                                    <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg>
+                                </span>
+                                {% comment %} <span>{% trans "I agree with the terms and conditions" %}</span> {% endcomment %}
+                            </label>
+                        </div>
+
+                        {% comment %} <div class="item">
+                            <a href="#" class="default-btn">{% trans "Buy it now!" %}</a>
+                        </div> {% endcomment %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab products-details-tab">
+            <ul class="tabs">
+                <li><a href="#">
+                    <div class="dot"></div> {% trans "Description" %}
+                </a></li>
+                
+                <li><a href="#">
+                    <div class="dot"></div> {% trans "Additional Information" %}
+                </a></li>
+
+                <li><a href="#">
+                    <div class="dot"></div> {% trans "Reviews" %} ({{ product.comments.count|intcomma:False|translate_number }})
+                </a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tabs-item">
+                    <div class="products-details-tab-content">
+                        <p>{{ product.description }}</p>
+                    </div>
+                </div>
+
+                <div class="tabs-item">
+                    <div class="products-details-tab-content">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <td>{% trans "Color:" %}</td>
+                                        <td>Blue, Purple, White</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{% trans "Size:" %}</td>
+                                        <td>20, 24</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{% trans "Material:" %}</td>
+                                        <td>100% Polyester</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{% trans "Height:" %}</td>
+                                        <td>180 cm - 5' 11”</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{% trans "Bust:" %}</td>
+                                        <td>83 cm - 32”</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{% trans "Waist:" %}</td>
+                                        <td>57 cm - 22”</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{% trans "Hips:" %}</td>
+                                        <td>88 cm - 35</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{% trans "Shipping:" %}</td>
+                                        <td>Free</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tabs-item">
+                    <div class="products-details-tab-content">
+                        <div class="products-review-form">
+                            <div class="review-comments">
+                                {% for comment in product.comments.all %}
+                                <div class="review-item">
+                                    <div class="rating">
+                                        {% for ـ in comment.stars_as_integer %}
+                                        <i class='bx bxs-star'></i>
+                                        {% endfor %}
+                                    </div>
+                                    <span><strong>{{ comment.name }}</strong> {% trans "on" %} <strong>{{ comment.datetime_created|to_jalali:'%d %B %Y'|translate_number }}</strong></span>
+                                    <p>{{ comment.body }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="review-form">
+                                <h3>{% trans "Write a Review" %}</h3>
+
+
+                                {% comment %} <form action="{% url "comment_create" product.pk %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12">
+                                            <div class="form-group" >
+                                                {{ comment_form|crispy }}
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12">
+                                            <div class="form-group">
+                                                <input type="submit" class="default-btn" value="{% trans "Submit Review" %}" >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form> {% endcomment %}
+
+                                <form action="{% url "comment_create" product.pk %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" id="name" name="name" placeholder="Enter your name" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="email" id="email" name="email" placeholder="Enter your email" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-12 col-md-12">
+                                            <div class="form-group">
+                                                <input type="text" id="review-title" name="stars" placeholder="Your score? (from 1 to 5)" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-12 col-md-12">
+                                            <div class="form-group">
+                                                <textarea name="body" id="review-body" cols="30" rows="6" placeholder="Write your comments here" class="form-control"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-12 col-md-12">
+                                            <button type="submit" class="default-btn">Submit Review</button>
+                                        </div>
+                                    </div>
+                                </form>
+
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="related-products">
+        <div class="container">
+            <div class="section-title">
+                <span class="sub-title">{% trans "Our Shop" %}</span>
+                <h2>{% trans "Related Products" %}</h2>
+            </div>
+
+            <div class="products-slides owl-carousel owl-theme">
+                {% for product in products %}
+                <div class="single-products-box">
+                    <div class="products-image">
+                        <a href="#">
+                            <img src="{% static "img/products/img1.jpg" %}" class="main-image" alt="image">
+                            <img src="{% static "img/products/img-hover1.jpg" %}" class="hover-image" alt="image">
+                        </a>
+
+                        <div class="products-button">
+                            <ul>
+                                <li>
+                                    <div class="wishlist-btn">
+                                        <a href="#">
+                                            <i class='bx bx-heart'></i>
+                                            <span class="tooltip-label">{% trans "Add to Wishlist" %}</span>
+                                        </a>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="compare-btn">
+                                        <a href="#">
+                                            <i class='bx bx-refresh'></i>
+                                            <span class="tooltip-label">{% trans "Compare" %}</span>
+                                        </a>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="quick-view-btn">
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#productsQuickView">
+                                            <i class='bx bx-search-alt'></i>
+                                            <span class="tooltip-label">{% trans "Quick View" %}</span>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="products-content">
+                        <h3><a href="{% url "product.get_absolute_url" %}">{{ product.title }}</a></h3>
+                        <div class="price">
+                            <span class="old-price">$321</span>
+                            <span class="new-price">$ {{ product.price }}</span>
+                        </div>
+                        <div class="star-rating">
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                        </div>
+                        <a href="{% url "cart_add" product.id %}" class="add-to-cart">{% trans "Add to Cart" %}</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Product Details Area -->
+
+<!-- Size Guide Modal Area -->
+{% include "store/size_guide.html" %}
+
+
+{% endblock content %}

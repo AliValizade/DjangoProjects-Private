@@ -1,0 +1,151 @@
+{% extends "_base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+
+{% block content %}
+    <!-- Start Main Banner Area -->
+    <div class="home-slides-two owl-carousel owl-theme">
+        {% for i in '123'|make_list %}
+        <div class="main-banner banner-bg{{ i }}">
+            <div class="d-table">
+                <div class="d-table-cell">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-12">
+                                <div class="banner-content text-white">
+                                    <div class="line"></div>
+                                    <span class="sub-title">{% trans "Trending Women's Collection" %}</span>
+                                    <h1>{{ mytitles.forloop.counter0 }}</h1>
+                                    <p>{% trans "Click here to shop in your local currency. We ship over 2 million products around the world!" %}</p>
+                                    <div class="btn-box">
+                                        <a href="{% url "women_shop" %}" class="default-btn">{% trans "Shop Women's" %}</a>
+                                        <a href="{% url "men_shop" %}" class="optional-btn">{% trans "Shop Men's" %}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <!-- End Main Banner Area -->
+
+<!-- Categories Banner Area -->
+{% include "store/category_area.html" %}
+
+    <!-- Start New-Products Area -->
+    <section class="products-area pb-70">
+        {% trans "New Products" as title %}
+        {% trans "New" as label %}
+        {% include 'store/product_list_partial.html' with products=view.get_new_products title=title label=label %}
+    </section>
+    <!-- End New-Products Area -->
+
+    <!-- Start Offer Area -->
+    <section class="offer-area bg-image2 ptb-100 jarallax" data-jarallax='{"speed": 0.3}'>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-5 col-md-6 offset-lg-7 offset-md-6">
+                    <div class="offer-content-box">
+                        <span class="sub-title">{% trans "Limited Time Offer!" %}</span>
+                        <h2>-40% {% trans "OFF" %}</h2>
+                        <p>{% trans "Get The Best Deals Now" %}</p>
+                        <a href="products-right-sidebar.html" class="default-btn">{% trans "Discover Now" %}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Offer Area -->
+
+    <!-- Start Popular-Products Area -->
+    <section class="products-area pt-100 pb-70">
+        {% trans "Popular Products" as title %}
+        {% trans "Popular" as label %}
+        {% include 'store/product_list_partial.html' with products=view.get_popular_products title=title label=label %}
+    </section>
+    <!-- End Popular-Products Area -->
+
+    <!-- Start Products Area -->
+    <section class="products-area pb-70">
+        {% trans "Best sell Products" as title %}
+        {% trans "Best sell" as label %}
+        {% include 'store/product_list_partial.html' with products=view.get_best_selling_products title=title label=label %}
+    </section>
+    <!-- End Products Area -->
+
+    <!-- Start Brand Area -->
+    <div class="brand-area ptb-70">
+        <div class="container">
+            <div class="section-title">
+                <h2>{% trans "Shop By Brand" %}</h2>
+            </div>
+            
+            <div class="brand-slides owl-carousel owl-theme">
+                <div class="brand-item">
+                    <a href="#"><img src="{% static "img/brand/img1.png" %}" alt="image"></a>
+                </div>
+
+                <div class="brand-item">
+                    <a href="#"><img src="{% static "img/brand/img2.png" %}" alt="image"></a>
+                </div>
+
+                <div class="brand-item">
+                    <a href="#"><img src="{% static "img/brand/img3.png" %}" alt="image"></a>
+                </div>
+
+                <div class="brand-item">
+                    <a href="#"><img src="{% static "img/brand/img4.png" %}" alt="image"></a>
+                </div>
+
+                <div class="brand-item">
+                    <a href="#"><img src="{% static "img/brand/img5.png" %}" alt="image"></a>
+                </div>
+
+                <div class="brand-item">
+                    <a href="#"><img src="{% static "img/brand/img6.png" %}" alt="image"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Brand Area -->
+
+    <!-- Start Blog Area -->
+    <section class="blog-area pt-100 pb-70">
+        <div class="container">
+            <div class="section-title">
+                <span class="sub-title">{% trans "Recent Story" %}</span>
+                <h2>{% trans "From The Fitzone Blog" %}</h2>
+            </div>
+
+            <div class="row">
+                {% for post in latest_posts %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="single-blog-post">
+                        <div class="post-image">
+                            <a href="{{ post.get_absolute_url }}">
+                                <img src="{{ post.image.url }}" alt="image">
+                            </a>
+                            <div class="date">
+                                <span>{{ post.datetime_created|date:"Y-m-d" }}</span>
+                            </div>
+                        </div>
+
+                        <div class="post-content">
+                            <span class="category">{{ post.title }}</span>
+                            <h3><a href="single-blog-2.html">{{ post.post|truncatewords:20 }}</a></h3>
+                            <a href="single-blog-2.html" class="details-btn">{% trans "Read Story" %}</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <!-- End Blog Area -->
+    
+{% endblock content %}

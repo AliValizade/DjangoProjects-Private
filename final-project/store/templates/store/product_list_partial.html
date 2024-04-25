@@ -1,0 +1,90 @@
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load persian_translation_tags %}
+{% load humanize %}
+
+<div class="container">
+    <div class="section-title">
+        <span class="sub-title">{% trans "See Our Collection" %}</span>
+        <h2>{{ title }}</h2>
+    </div>
+
+    <div class="row">
+        {% for product in products %}
+        <div class="col-lg-4 col-md-6 col-sm-6">
+            <div class="products-box">
+                <div class="products-image">
+                    <a href="{{ product.get_absolute_url }}">
+                        {% if product.main_image %}
+                            <img src="{{ product.main_image.image.url }}" class="main-image" alt="{{ product.name }}">
+                            <img src="{{ product.main_image.image.url }}" class="hover-image" alt="{{ product.name }}">
+                        {% endif %}
+                    </a>
+
+                    <div class="products-button">
+                        <ul>
+                            <li>
+                                <div class="wishlist-btn">
+                                    <a href="{% url 'add_to_wishlist' product_id=product.id %}">
+                                        <i class='bx bx-heart'></i>
+                                        <span class="tooltip-label">{% trans "Add to Wishlist" %}</span>
+                                    </a>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="compare-btn">
+                                    <a href="#">
+                                        <i class='bx bx-refresh'></i>
+                                        <span class="tooltip-label">{% trans "Compare" %}</span>
+                                    </a>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="quick-view-btn">
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#productsQuickView">
+                                        <i class='bx bx-search-alt'></i>
+                                        <span class="tooltip-label">{% trans "Quick View" %}</span>
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="new-tag">{{ label }}</div>
+                </div>
+
+                <div class="products-content">
+                    <span class="category">{{ product.category }}</span>
+                    <h3><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3>
+                    <div class="star-rating">
+                        <span>{% trans "Score" %}: 
+                            {% for ـ in product.average_rating %}
+                                <i class='bx bxs-star'></i>
+                            {% endfor %}
+                        </span>
+                    </div>
+                    <div class="price">
+                        <span class="old-price">{{product.price|intcomma:False|translate_number}} {% trans "$" %}</span>
+                        <span class="new-price">{{product.price|intcomma:False|translate_number}} {% trans "$" %}</span>
+                    </div>
+                    <form action="{% url "cart_add" product.id %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="default-btn"><i class="add-to-cart"></i>{% trans "Add to Cart " %}</button>                        
+                    </form>
+                </div>
+
+                <span class="products-discount">
+                    <span>
+                        20% {% trans "OFF" %}
+                    </span>
+                </span>
+            </div>
+        </div>
+        <!-- QuickView Modal Area -->
+        {% include "store/quickview.html" %}
+        {% endfor %}
+    </div>
+
+</div>

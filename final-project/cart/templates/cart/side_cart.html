@@ -1,0 +1,57 @@
+{% load static %}
+{% load i18n %}
+{% load jalali_tags %}
+{% load persian_translation_tags %}
+{% load humanize %}
+
+<!-- Start Shopping Cart Modal -->
+<div class="modal right fade shoppingCartModal" id="shoppingCartModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true"><i class='bx bx-x'></i></span>
+            </button>
+
+            <div class="modal-body">
+                <h3>{% trans "My Cart" %} ({{cart|length|intcomma:False|translate_number}})</h3>
+
+                <div class="products-cart-content">
+                    {% for item in cart %}
+                    <div class="products-cart">
+                        <div class="products-image">
+                            <a href="{{item.product_obj.get_absolute_url}}"><img src="{{ item.product_obj.image.url }}"></a>
+                        </div>
+
+                        <div class="products-content">
+                            <h3><a href="{{item.product_obj.get_absolute_url}}">{{item.product_obj.name}}</a></h3>
+                            <span>Blue / XS</span>
+                            <div class="products-price">
+                                <span>{{item.quantity|intcomma:False|translate_number}}</span>
+                                <span>x</span>
+                                <span class="price">{{item.product_obj.price|intcomma:False|translate_number}} {% trans "$" %}</span>
+                            </div>
+                            <a href="{% url "cart_remove" item.product_obj.id %}" class="remove-btn"><i class='bx bx-trash'></i></a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="products-cart-subtotal">
+                    <span>{% trans "Subtotal" %}</span>
+
+                    <span class="subtotal">{{cart.get_total_price|intcomma:False|translate_number}} {% trans "$" %}</span>
+                </div>
+
+                <div class="products-cart-btn">
+                    {% if user.is_authenticated %}
+                        <a href="{% url "checkout" %}" class="default-btn">{% trans "Proceed to Checkout" %}</a>
+                    {% else %}
+                        <a href="{% url "account_login" %}" class="default-btn">{% trans "Proceed to Checkout" %}</a>
+                    {% endif %}
+                    <a href="{% url "cart_detail" %}" class="optional-btn">{% trans "View Shopping Cart" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Shopping Cart Modal -->

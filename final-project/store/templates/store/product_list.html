@@ -1,0 +1,21 @@
+{% extends "_base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+    
+<!-- Page Title -->
+{% trans "Store" as header_name %}
+{% trans "products" as page_name %}
+{% include "header_name.html" with header_name=header_name page_name=page_name %}
+
+<!-- Categories Banner Area -->
+{% include "store/category_area.html" %}
+
+<!-- Products Area -->
+{% include 'store/product_area.html' with products=products %}
+
+{% endblock content %}

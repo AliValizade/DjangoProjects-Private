@@ -1,0 +1,120 @@
+{% extends "_base.html" %}
+
+{% load jalali_tags %}
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load persian_translation_tags %}
+{% load humanize %}
+
+{% block content %}
+
+    <!-- Start Page Title -->
+    {% trans "Cart" as header_name %}
+    {% trans "Cart" as page_name %}
+    {% include "header_name.html" with header_name=header_name page_name=page_name %}
+
+    <!-- Start Cart Area -->
+    <section class="cart-area ptb-100">
+        <div class="container">
+            {% if cart %}
+                <div class="cart-table table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">{% trans "Product" %}</th>
+                                <th scope="col">{% trans "Name" %}</th>
+                                <th scope="col">{% trans "Unit Price" %}</th>
+                                <th scope="col">{% trans "Quantity" %}</th>
+                                <th scope="col">{% trans "Subtotal" %}</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for item in cart %}
+                                <tr>
+                                    <td class="product-thumbnail">
+                                        <a href="{{item.product_obj.get_absolute_url}}">
+                                            {% if product.main_image %}
+                                                <img src="{{ product.main_image.image.url }}" alt="{{ product.name }}">
+                                            {% endif %}
+
+                                            {% comment %} <img src="{{ item.product_obj.image.url }}" alt="item"> {% endcomment %}
+                                        </a>
+                                    </td>
+
+                                    <td class="product-name">
+                                        <a href="{{item.product_obj.get_absolute_url}}">{{ item.product_obj.name }}</a>
+                                        <ul>
+                                            <li>{% trans "Color" %}: <span>Light Blue</span></li>
+                                            <li>{% trans "Size:" %} <span>XL</span></li>
+                                            <li>{% trans "Material:" %} <span>Cotton</span></li>
+                                        </ul>
+                                    </td>
+
+                                    <td class="product-price">
+                                        <span class="unit-amount">{{item.product_obj.price|intcomma:False|translate_number}} {% trans "$" %}</span>
+                                    </td>
+
+                                    <td class="product-quantity">
+                                        <form action="{% url "cart_add" item.product_obj.id %}" method="POST">
+                                            {% csrf_token %}
+                                            <div class="input-counter">
+                                                <span class="minus-btn"><i class='bx bx-minus'></i></span>
+                                                <input type="text" name="quantity" value="{{ item.quantity }}">
+                                                <span class="plus-btn"><i class='bx bx-plus'></i></span>
+                                                {{ item.product_update_quantity_form.inplace }}
+                                            </div>
+                                            <button type="submit" class="border-0"><i class='bx bx-refresh'></i></button>
+                                        </form>
+                                    </td>
+
+                                    <td class="product-subtotal">
+                                        <span class="subtotal-amount">{{item.total_price|intcomma:False|translate_number}} {% trans "$" %}</span>
+
+                                        <a href="{% url "cart_remove" item.product_obj.id %}" class="remove"><i class='bx bx-trash'></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="cart-buttons">
+                    <div class="row align-items-center">
+                        <div class="col-lg-7 col-sm-7 col-md-7">
+                            <a href="{% url "product_list" %}" class="optional-btn">{% trans "Continue Shopping" %}</a>
+                        </div>
+    
+                        <div class="col-lg-5 col-sm-5 col-md-5 text-end">
+                            <a href="{% url "cart_clear" %}" class="default-btn">{% trans "Delete Cart" %}</a>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="cart-totals">
+                    <h3>{% trans "Cart Totals" %}</h3>
+    
+                    <ul>
+                        <li>{% trans "Subtotal" %} <span>{{cart.get_total_price|intcomma:False|translate_number}} {% trans "$" %}</span></li>
+                        <li>{% trans "Shipping" %} <span>0 {% trans "$" %}</span></li>
+                        <li>{% trans "Total" %} <span>{{cart.get_total_price|intcomma:False|translate_number}} {% trans "$" %}</span></li>
+                    </ul>
+                    {% if user.is_authenticated %}
+                        <a href="{% url "checkout" %}" class="default-btn">{% trans "Payment" %}</a>
+                    {% else %}
+                        <a href="{% url "account_login" %}" class="default-btn">{% trans "Payment" %}</a>
+                    {% endif %}
+                    <div class="cart-buttons">
+                    <span>{% trans "By selecting the payment button and completing the purchase, you have declared your agreement with the rules and regulations as well as the terms of returning Bonnymode orders." %}</span>
+                    </div>
+                </div>
+            {% else %}
+                <p>{% trans "Cart is empty! Please add some products to the cart." %}</p>
+                <span class="fw-bold"><a href="{% url "product_list" %}" class="link-infinite">{% trans "Go Shopping" %}</a></span>
+            {% endif %}
+
+        </div>
+    </section>
+    <!-- End Cart Area -->
+
+{% endblock content %}

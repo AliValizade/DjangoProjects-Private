@@ -1,0 +1,210 @@
+{% extends "_base.html" %}
+
+{% load jalali_tags %}
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load persian_translation_tags %}
+{% load humanize %}
+
+{% block content %}
+
+    <!-- Start Page Title -->
+    {% trans "Checkout" as header_name %}
+    {% trans "Checkout" as page_name %}
+    {% include "header_name.html" with header_name=header_name page_name=page_name %}
+
+    <!-- Start Checkout Area -->
+    <section class="checkout-area ptb-100">
+        <div class="container">
+            <div class="user-actions">
+                {% comment %} <i class='bx bx-log-in'></i> {% endcomment %}
+                {% if user.is_authenticated %}
+                    <span>{% trans "Hello" %} {{ user.username }}</span> 
+                    <span>{% trans "Do you want to register orders?" %}</span>
+                {% else %}
+                    <span>{% trans "Do you want to register orders?" %} 
+                        <a href="{% url "account_login" %}">{% trans "Please login" %}</a>
+                    </span>
+                {% endif %}
+            </div>
+
+            <form action="" method="POST">
+                {% csrf_token %}
+                {% comment %} {% if form.errors %}
+                    <div>
+                        {{form.errors}}
+                    </div>
+                {% endif %} {% endcomment %}
+                <div class="row">
+                    <div class="col-lg-6 col-md-12">
+                        {{form|crispy}}
+                        {% comment %} <div class="billing-details">
+                            <h3 class="title">{% trans "Billing Details" %}</h3>
+
+                            <div class="row">
+
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <label>{% trans "First Name " %}<span class="required">*</span></label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <label>{% trans "Last Name" %} <span class="required">*</span></label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12">
+                                    <div class="form-group">
+                                        <label>{% trans "Email Address" %} <span class="required">*</span></label>
+                                        <input type="email" class="form-control">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-12 col-md-12">
+                                    <div class="form-group">
+                                        <label>{% trans "State / County" %} <span class="required">*</span></label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-12 col-md-6">
+                                    <div class="form-group">
+                                        <label>{% trans "Town / City" %} <span class="required">*</span></label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-6">
+                                    <div class="form-group">
+                                        <label>{% trans "Address" %} <span class="required">*</span></label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <label>{% trans "Postcode / Zip " %}<span class="required">*</span></label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <label>{% trans "Phone" %} <span class="required">*</span></label>
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="create-an-account">
+                                        <label class="form-check-label" for="create-an-account">{% trans "Create an account?" %}</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="ship-different-address">
+                                        <label class="form-check-label" for="ship-different-address">{% trans "Ship to a different address?" %}</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12">
+                                    <div class="form-group">
+                                        <textarea name="notes" id="notes" cols="30" rows="5" placeholder="Order Notes" class="form-control"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> {% endcomment %}
+                    </div>
+            
+                    <div class="col-lg-6 col-md-12">
+                        <div class="order-details">
+                            <h3 class="title">{% trans "Your Order" %}</h3>
+
+                            <div class="order-table table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">{% trans "Product Name" %}</th>
+                                            <th scope="col">{% trans "Total" %}</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {% for item in cart %}
+                                            <tr>
+                                                <td class="product-name">
+                                                    <a href="{{item.product_obj.get_absolute_url}}">{{ item.product_obj.name }}</a>
+                                                </td>
+
+                                                <td class="product-total">
+                                                    <span class="subtotal-amount">{{item.total_price|intcomma:False|translate_number}} {% trans "$" %}</span>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        <tr>
+                                            <td class="order-subtotal">
+                                                <span>{% trans "Cart Subtotal" %}</span>
+                                            </td>
+
+                                            <td class="order-subtotal-price">
+                                                <span class="order-subtotal-amount">{{cart.get_total_price|intcomma:False|translate_number}} {% trans "$" %}</span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="order-shipping">
+                                                <span>{% trans "Shipping" %}</span>
+                                            </td>
+
+                                            <td class="shipping-price">
+                                                <span> 0 {% trans "$" %}</span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="total-price">
+                                                <span>{% trans "Order Total" %}</span>
+                                            </td>
+
+                                            <td class="product-subtotal">
+                                                <span class="subtotal-amount">{{cart.get_total_price|intcomma:False|translate_number}} {% trans "$" %}</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="payment-box">
+                                <div class="payment-method">
+                                    <p>
+                                        <input type="radio" id="direct-bank-transfer" name="radio-group" checked>
+                                        <label for="direct-bank-transfer">{% trans "Direct Bank Transfer" %}</label>
+                                        {% trans "Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account." %}
+                                    </p>
+                                    <p>
+                                        <input type="radio" id="paypal" name="radio-group">
+                                        <label for="paypal">PayPal</label>
+                                    </p>
+                                    <p>
+                                        <input type="radio" id="cash-on-delivery" name="radio-group">
+                                        <label for="cash-on-delivery">{% trans "Cash on Delivery" %}</label>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="default-btn">{% trans "Place Order" %}</button>
+                </div>
+            </form>
+        </div>
+    </section>
+    <!-- End Checkout Area -->
+
+{% endblock content %}

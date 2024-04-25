@@ -1,0 +1,36 @@
+{% extends "_base.html" %}
+
+{% load i18n %}
+
+
+{% block content %}
+
+    <!-- Start Page Title -->
+    {% trans "Logout" as header_name %}
+    {% trans "Logout" as page_name %}
+    {% include "header_name.html" with header_name=header_name page_name=page_name %}
+    
+
+    <!-- Start Login Area -->
+    <section class="login-area ptb-100">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div class="login-content">
+
+                        <h2>{% trans "Are you sure you want to Logout?" %}</h2>
+
+                        <form action="" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="default-btn">{% trans "Logout" %}</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Login Area -->
+
+
+{% endblock content %}
