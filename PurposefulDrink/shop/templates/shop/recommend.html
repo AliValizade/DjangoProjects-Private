@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Herb Suggestions</title>
+</head>
+<body>
+    <h1>Recommended Herbs</h1>
+    {% if recommendations %}
+        <ul>
+            {% for herb, score in recommendations %}
+            <li>{{ herb }} (Score: {{ score }})</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No special offer was found for your disease and you can use neutral packages:</p>
+        <ul>
+            {% for package in neutral_packages %}
+            <li>{{ package.name }}: <br> {{ package.description }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h2>Forbidden Herbs</h2>
+    <ul>
+        {% for herb, diseases in forbidden_list %}
+        <li>{{ herb }} Is forbidden for: {{ diseases }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
