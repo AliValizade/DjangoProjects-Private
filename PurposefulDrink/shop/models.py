@@ -69,3 +69,12 @@ class Herb(models.Model):
     def __str__(self) -> str:
         return self.name
 
+
+class Suitability(models.Model):
+    herb = models.ForeignKey(Herb, on_delete=models.CASCADE)
+    disease = models.ForeignKey(Disease, on_delete=models.CASCADE)
+    score = models.IntegerField()  # 1 to 5 for suitability, -100 for prohibited
+
+    def __str__(self) -> str:
+        return f"{self.herb} Score for {self.disease} is {self.score} "
+    
