@@ -6,13 +6,13 @@ from . import models
 
 class SuitabilityInline(admin.TabularInline):
     model = models.Suitability
-    fields = ['disease', 'score']
-    extra = 3 
+    fields = ['disease', 'negative_states', 'herb_properties', 'score']
+    extra = 1 
 
 
 @admin.register(models.Herb)
 class HerbAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'temperament', 'suitable_season', 'age_group', ]
+    list_display = ['id', 'name', 'temperament', 'suitable_season', ]
     inlines = [SuitabilityInline]  
 
 
@@ -24,7 +24,7 @@ class DiseaseAdmin(admin.ModelAdmin):
 
 @admin.register(models.Suitability)
 class SuitabilityAdmin(admin.ModelAdmin):
-    list_display = ['id', 'herb', 'disease', 'score', ]
+    list_display = ['id', 'herb', 'disease', 'negative_states', 'score', ]
 
 
 @admin.register(models.NeutralPackage)

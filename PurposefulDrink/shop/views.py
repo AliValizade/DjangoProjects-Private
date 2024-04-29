@@ -1,7 +1,7 @@
+from django.db.models import Sum, F, Q, Exists, OuterRef
 from django.views import View
 from django.shortcuts import render
 from .models import Herb, Disease, Suitability, NeutralPackage
-
 from .forms import DiseaseForm
 
 class RecommendHerbsView(View):
@@ -17,21 +17,31 @@ class RecommendHerbsView(View):
         form = self.form_class(request.POST)
         if form.is_valid():
             selected_diseases = form.cleaned_data['diseases']
-            herbs = Herb.objects.all()
-            herb_scores = {herb: herb.get_total_score(selected_diseases) for herb in herbs}
-            forbidden_herbs = {herb for herb in herbs if herb.is_forbidden(selected_diseases)}
-
-            # Delete forbidden herbs from recommendations
-            for herb in forbidden_herbs:
-                herb_scores.pop(herb, None)
-
-            # Sort herbs by score and select top 3
-            recommended_herbs = sorted(herb_scores, key=herb_scores.get, reverse=True)[:3]
-            recommendations = [(herb.name, herb_scores[herb]) for herb in recommended_herbs]
+            recommended_herbs = Herb.get_recommended_herbs(selected_diseases)
+            recommendations = [(herb.name, herb.total_score) for herb in recommended_herbs]
             neutral_packages = NeutralPackage.objects.all()
 
-            # Create a list of descriptions for forbidden herbs
-            forbidden_list = [(herb.name, ', '.join([disease.name for disease in selected_diseases if herb.is_forbidden([disease])])) for herb in forbidden_herbs]
+
+            
+            # Check if all recommended herbs have a total_score of 0 or None
+            if all(score is None or score == 0 for _, score in recommendations):
+                # Only show neutral packages if no valid recommendations exist
+                return render(request, self.success_template_name, {
+                    'neutral_packages': neutral_packages,
+                    'recommendations': None
+                })
+
+            all_forbidden_suitabilities = Suitability.objects.filter(
+            disease__in=selected_diseases,
+            score=-100
+            ).select_related('herb').all()
+
+            forbidden_herbs_dict = {suitability.herb.id: suitability.herb for suitability in all_forbidden_suitabilities}
+
+            forbidden_list = [
+                (forbidden_herbs_dict[herb_id].name, ', '.join([disease.name for disease in selected_diseases]))
+                for herb_id in forbidden_herbs_dict
+            ]
 
             return render(request, self.success_template_name, {
                 'recommendations': recommendations,
