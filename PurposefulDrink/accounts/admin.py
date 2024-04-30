@@ -3,10 +3,11 @@ from django import forms
 from django.db import models
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin  as BaseUserAdmin
-from .forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.models import Group
+
 from .models import Profile, CustomUser
-# Register your models here.
+from .forms import UserChangeForm, UserCreationForm
+
 
 class ProfileInline(admin.StackedInline):
     model = Profile
@@ -20,7 +21,7 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ('is_admin', )
 
     fieldsets = (
-        ('Main', {'fields':('email', 'phone_number', 'fullname', 'password', 'address', 'gender', 'activity')}),
+        ('Main', {'fields':('email', 'phone_number', 'fullname', 'password', 'address', 'gender')}),
         ('Permissions', {'fields':('is_active', 'is_admin')}),
     )
 

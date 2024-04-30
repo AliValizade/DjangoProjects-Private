@@ -4,29 +4,16 @@ from .manager import UserManager
 
 
 class CustomUser(AbstractBaseUser):
-    ACTIVITY_CHOICES = [
-        ('high','High'),
-        ('medium', 'meduim'),
-        ('low', 'low'),
-    ]
-
-    JOB_CHOICES = [
-        ('foucesd', 'Focused'),
-        ('bodypreasure', 'Bodypreasure'),
-        ('nothing', 'Nothing'),
-    ]
-
     GENDER_CHOICE = [
         ('male','Male'),
         ('female','Female')
     ]
-    phone_number = models.CharField(max_length=11, unique=True, default='09151234567')
+    phone_number = models.CharField(max_length=11, unique=True)
     email = models.EmailField(unique=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     fullname = models.CharField(max_length=100, default=' ')
     address = models.TextField(blank=True, null=True)
-    activity = models.CharField(max_length=100, choices=ACTIVITY_CHOICES, null=True, blank=True)
     gender = models.CharField(max_length=100, choices=GENDER_CHOICE, default='male')
 
     objects = UserManager()
@@ -47,7 +34,6 @@ class CustomUser(AbstractBaseUser):
     def is_staff(self):
         return self.is_admin
     
-        
 class Information(models.Model):
     """ 
     abstract base class inheritance 
@@ -76,34 +62,28 @@ class Information(models.Model):
     POLLUTION_LEVEL_CHOICES = {
         "LOW": "کم",
         "MEDIUM": "متوسط",
-        "MUCH": "زیاد"
+        "MUCH": "زیاد",
+        "POLLUTED_JOBS": "مشاغل آلوده",
     }    
     JOB_TYPE_CHOICES = {
-        "STUDENT": "دانشجو",
-        "MANAGER": "مدیریتی",
-        "WORKER": "کارگری",
-        "SENSITIVE_JOBS": "مشاعل حساس"
+        'STUDENT': 'دانشجو',
+        'CLERK': 'کارمند',
+        'WORKER': 'کارگر',
+        'SALESPERSON': 'فروشنده',
+        'SENSITIVE_JOBS': 'مشاغل حساس',
+        'HARD_JOBS': 'مشاغل سخت',
+        'ATHLETE': 'ورزشکار',
+        'HOMEMAKER': 'خانه دار',
+        'MANAGEMENT': 'مدیریت',
     }
     # TODO: job change create table job normalization db
-    job_pollution_level = models.CharField(
-        max_length=10, choices=POLLUTION_LEVEL_CHOICES, verbose_name="سطج آلودگی شغل", null=True, blank=True
-    )    
-    job_category = models.CharField(
-        max_length=55, choices=JOB_TYPE_CHOICES, verbose_name="شغل کاربر", null=True, blank=True
-    )
-
-    seasonal_allergy = models.CharField(
-        max_length=10, choices=SEASONAL_ALLERGY_CHOICES, verbose_name="آلرژی فصلی ", null=True, blank=True
-    )
-    taste_sensitivity = models.CharField(
-        max_length=10, choices=TASTE_SENSITIVITY_CHOICES, verbose_name="حساسیت به طعم", null=True, blank=True
-    )
-    age_category = models.CharField(
-        max_length=11, choices=AGE_CATEGORY_CHOICES, verbose_name="رده سنی ", null=True, blank=True
-    ) 
+    job_pollution_level = models.CharField(max_length=13, choices=POLLUTION_LEVEL_CHOICES, verbose_name="سطج آلودگی شغل")    
+    job_category = models.CharField(max_length=55, choices=JOB_TYPE_CHOICES, verbose_name="شغل کاربر")
+    seasonal_allergy = models.CharField(max_length=10, choices=SEASONAL_ALLERGY_CHOICES, verbose_name="آلرژی فصلی ", null=True, blank=True)
+    taste_sensitivity = models.CharField(max_length=10, choices=TASTE_SENSITIVITY_CHOICES, verbose_name="حساسیت به طعم", null=True, blank=True)
+    age_category = models.CharField(max_length=11, choices=AGE_CATEGORY_CHOICES, verbose_name="رده سنی ") 
 
     class Meta:
-        
         abstract = True
         
 class Profile(Information):

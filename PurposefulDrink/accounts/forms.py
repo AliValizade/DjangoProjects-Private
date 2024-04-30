@@ -3,13 +3,14 @@ from .models import CustomUser
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
+
 class UserCreationForm(forms.ModelForm):
     password1 = forms.CharField(label='password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='confirm password', widget=forms.PasswordInput)
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'phone_number', 'fullname', 'address','gender', 'activity')
+        fields = ('email', 'phone_number', 'fullname', 'address','gender')
 
     def clean_password2(self):
         cd = self.cleaned_data
@@ -28,7 +29,7 @@ class UserChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField(help_text= 'you can change password by using <a href=\"../password/\"> this form</a>. ')
     class Meta:
         model = CustomUser
-        fields = ('email', 'phone_number', 'fullname', 'address','gender','activity')
+        fields = ('email', 'phone_number', 'fullname', 'address','gender')
 
 class UserRegisterForm(forms.Form):
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'ایمیل'}))
@@ -39,7 +40,7 @@ class UserRegisterForm(forms.Form):
 class UserEditProfileForm(forms.ModelForm):
    class Meta:
        model = CustomUser
-       fields = ('address', 'activity', 'gender')
+       fields = ('address', 'gender')
        
 class VefiyCodeForm(forms.Form):
     code = forms.IntegerField()

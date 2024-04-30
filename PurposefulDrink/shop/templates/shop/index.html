@@ -1,13 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Select Diseases</title>
+    <title>Select Diseases and View Recommendations</title>
 </head>
 <body>
-    <form method="post">
+    <h3>Select Your Diseases</h3>
+    <form method="post" action=".">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Suggest Herbs</button>
     </form>
+
+    <h2 id="recommendations">Recommended Herbs</h2>
+    {% if herbs %}
+        <ul>
+            {% for herb in herbs %}
+            <li>{{ herb.name }} (Score: {{ herb.total_score }})</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No herbs found matching your conditions.</p>
+    {% endif %}
 </body>
 </html>
