@@ -15,6 +15,9 @@ class RecommendHerbsView(FormView):
         herbs = Herb.objects.get_suitable_herbs(selected_diseases)
         context['herbs'] = herbs
 
+        user_profile = self.request.user.profile
+        context['recommendations'] = user_profile.get_recommendations()
+
         forbidden_herbs = Suitability.objects.filter(
             disease__in=selected_diseases, score=-100
         ).select_related('herb', 'disease').order_by('herb__name')

@@ -91,6 +91,14 @@ class Profile(Information):
     user profile + user information
     """
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="profile")
+
+    def get_recommendations(self):
+        recommendations = []
+        if self.age_category == 'BABY':
+            recommendations.append("استفاده از گیاهان دارویی برای خردسالان باید تحت نظارت پزشک باشد.")
+        if self.job_pollution_level == 'MUCH' or self.job_pollution_level == 'POLLUTED_JOBS':
+            recommendations.append("شما که در محیط‌ کاری آلوده کار می‌کنید باید از گیاهانی استفاده کنید که مقاومت بدنی را افزایش دهد.")
+        return recommendations
     
     def __str__(self) -> str:
         return self.user.fullname
