@@ -36,13 +36,6 @@ class Herb(models.Model):
 
     objects = HerbManager()
 
-    # @classmethod
-    # def get_recommended_herbs(cls, selected_diseases):
-    #     return cls.objects.filter(suitability_herb__disease__in=selected_diseases, suitability_herb__score__gt=0).annotate(
-    #         total_score=Sum('suitability_herb__score'),
-    #         is_forbidden=Exists(Suitability.objects.filter(herb=OuterRef('pk'), disease__in=selected_diseases, score=-100))
-    #     ).exclude(is_forbidden=True).order_by('-total_score')[:3]
-
     def __str__(self) -> str:
         return self.name
 
