@@ -1,8 +1,5 @@
 from django.views.generic.edit import FormView
-from django.views.generic import TemplateView
-from django.db.models import Sum, Case, When, IntegerField
-from django.urls import reverse_lazy
-from .models import Herb, Suitability
+from cms.models import Herb, Suitability
 from .forms import DiseaseForm
 
 class RecommendHerbsView(FormView):

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     'accounts',
     'shop',
+    'cms',
 ]
 
 MIDDLEWARE = [
@@ -85,7 +86,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'juice',
+        'NAME': 'smartjuice',
         'HOST': 'localhost',
         'USER': 'postgres',
         'PASSWORD': 'Ali871325453',

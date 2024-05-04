@@ -1,70 +1,82 @@
-from django.db import models
-from django.db.models import Sum, F, Q, Exists, OuterRef
+# from django.db import models
+# from django.db.models import Sum, F, Q, Exists, OuterRef
+# from django.core.validators import MaxValueValidator, MinValueValidator
 
-from .manager import HerbManager
+# from .manager import HerbManager
 
-class Disease(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(verbose_name="توضیحات", default='Description')
+# class Disease(models.Model):
+#     name = models.CharField(max_length=100)
+#     description = models.TextField(verbose_name="توضیحات", default='Description')
 
-    def __str__(self) -> str:
-        return self.name
+#     def __str__(self) -> str:
+#         return self.name
 
-class Herb(models.Model):
-    # Choose a category (cold or warm)
-    TEMPERAMENT_CHOICES = [
-        ('COLD', 'سرد'),
-        ('HOT', 'گرم'),
-    ]
-    # Choose the right season
-    SEASON_CHOICES = [
-        ('SPRING', 'بهار'),
-        ('SUMMER', 'تابستان'),
-        ('AUTUMN', 'پاییز'),
-        ('WINTER', 'زمستان'),
-    ]
-    NEGATIVE_EFFECT_CHOICES = [
-        ('consultation_needed', 'نیاز به مشورت به پزشک دارد'),
-        ('contradiction', 'تعارض دارد'),
-        ('prohibited', 'قدغن است')
-    ]
-    name = models.CharField(max_length=100)
-    primary_use = models.TextField(verbose_name="کاربرد اصلی")
-    negative_effects = models.CharField(max_length=100, choices=NEGATIVE_EFFECT_CHOICES, verbose_name="حالت منفی", null=True, blank=True)
-    temperament = models.CharField(max_length=10, choices=TEMPERAMENT_CHOICES, default='COLD', help_text='Select the temperament category of the herb.')
-    suitable_season = models.CharField(max_length=10, choices=SEASON_CHOICES, default='SPRING', help_text='Select the suitable season for the herb.')
+# class Herb(models.Model):
+#     TEMPERAMENT_CHOICES = [
+#         ('COLD', 'سرد'),
+#         ('HOT', 'گرم'),
+#         ('BOTH', 'هردو'),
+#     ]
+#     name = models.CharField(max_length=100)
+#     temperament = models.CharField(max_length=10, choices=TEMPERAMENT_CHOICES, default='COLD', help_text='Select the temperament category of the herb.')
 
-    objects = HerbManager()
+#     objects = HerbManager()
 
-    def __str__(self) -> str:
-        return self.name
+#     def __str__(self) -> str:
+#         return self.name
 
-class UserDisease(models.Model):
-    user = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE, verbose_name="کاربر")
-    disease = models.ForeignKey('Disease', on_delete=models.CASCADE, verbose_name="بیماری")
-    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="زمان ثبت")
 
-    class Meta:
-        unique_together = ('user', 'disease')  # اطمینان از اینکه هر ترکیب کاربر و بیماری منحصر به فرد است
+# class SeasonalScore(models.Model):
+#     SEASON_CHOICES = [
+#         ('SPRING', 'بهار'),
+#         ('SUMMER', 'تابستان'),
+#         ('AUTUMN', 'پاییز'),
+#         ('WINTER', 'زمستان'),
+#     ]
 
-    def __str__(self):
-        return f"{self.user} - {self.disease}"
+#     herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='seasonal_scores')
+#     season = models.CharField(max_length=10, choices=SEASON_CHOICES)
+#     score = models.IntegerField(validators=[MinValueValidator(-3), MaxValueValidator(3)])
+
+#     def __str__(self) -> str:
+#         return f"{self.herb.name} - {self.get_season_display()}"
+
+#     class Meta:
+#         unique_together = ('herb', 'season')
+
+
+# # class UserDisease(models.Model):
+# #     user = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE, verbose_name="کاربر")
+# #     disease = models.ForeignKey('Disease', on_delete=models.CASCADE, verbose_name="بیماری")
+# #     timestamp = models.DateTimeField(auto_now_add=True, verbose_name="زمان ثبت")
+
+# #     class Meta:
+# #         unique_together = ('user', 'disease')  # Ensuring that each user and disease combination is unique
+
+# #     def __str__(self):
+# #         return f"{self.user} - {self.disease}"
     
-class Suitability(models.Model):
-    herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='suitability_herb')
-    disease = models.ForeignKey(Disease, on_delete=models.CASCADE, related_name='suitability_disease')
-    score = models.IntegerField()  # 1 to 5 for suitability, -100 for prohibited
+# class Suitability(models.Model):
+#     NEGATIVE_EFFECT_CHOICES = [
+#         ('consultation_needed', 'نیاز به مشورت به پزشک دارد'),
+#         ('contradiction', 'تعارض دارد'),
+#         ('prohibited', 'قدغن است')
+#     ]
+#     herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='suitability_herb')
+#     disease = models.ForeignKey(Disease, on_delete=models.CASCADE, related_name='suitability_disease')
+#     negative_effects = models.CharField(max_length=100, choices=NEGATIVE_EFFECT_CHOICES, verbose_name="حالت منفی", null=True, blank=True)
+#     score = models.IntegerField()  # 1 to 5 for suitability, -100 for prohibited
 
-    class Meta:
-        unique_together = ('herb', 'disease')  # اطمینان از اینکه هر ترکیب گیاه و بیماری منحصر به فرد است
+#     class Meta:
+#         unique_together = ('herb', 'disease')  # Ensuring that each plant and disease combination is unique
 
-    def __str__(self) -> str:
-        return f"{self.herb} Score for {self.disease} is {self.score} "
+#     def __str__(self) -> str:
+#         return f"{self.herb} Score for {self.disease} is {self.score} "
     
-class NeutralPackage(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField()
+# class NeutralPackage(models.Model):
+#     name = models.CharField(max_length=100)
+#     description = models.TextField()
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 

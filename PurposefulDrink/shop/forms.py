@@ -1,5 +1,5 @@
 from django import forms
-from .models import Disease
+from cms.models import Disease
 
 class DiseaseForm(forms.Form):
     diseases = forms.ModelMultipleChoiceField(
