@@ -16,14 +16,21 @@ class SeasonalScoreInline(admin.TabularInline):
 
 @admin.register(models.Herb)
 class HerbAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'temperament')
-    fields = ('name', 'temperament')
+    list_display = ('id', 'name', 'temperament', 'get_inappropriate_age_ranges', )
+    fields = ['name', 'temperament', 'inappropriate_age_ranges']
     inlines = [SuitabilityInline, SeasonalScoreInline]  
 
+    def get_inappropriate_age_ranges(self, obj):
+        return ", ".join([str(range) for range in obj.inappropriate_age_ranges.all()])
+    get_inappropriate_age_ranges.short_description = 'بازه‌های سنی نامناسب'
 
 @admin.register(models.Disease)
 class DiseaseAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', ]
+
+@admin.register(models.AgeRange)
+class AgeRangeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'min_age', 'max_age',]
 
 
 @admin.register(models.HerbInteraction)

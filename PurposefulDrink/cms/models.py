@@ -11,6 +11,15 @@ class Disease(models.Model):
     def __str__(self) -> str:
         return self.name
 
+
+class AgeRange(models.Model):
+    min_age = models.IntegerField(verbose_name="حداقل سن")
+    max_age = models.IntegerField(verbose_name="حداکثر سن")
+
+    def __str__(self) -> str:
+        return f"{self.min_age} تا {self.max_age} سال"
+    
+
 class Herb(models.Model):
     TEMPERAMENT_CHOICES = [
         ('COLD', 'سرد'),
@@ -19,6 +28,7 @@ class Herb(models.Model):
     ]
     name = models.CharField(max_length=100)
     temperament = models.CharField(max_length=10, choices=TEMPERAMENT_CHOICES, default='COLD', help_text='Select the temperament category of the herb.')
+    inappropriate_age_ranges = models.ManyToManyField(AgeRange, verbose_name="بازه‌های سنی نامناسب", blank=True)
 
     objects = HerbManager()
 
