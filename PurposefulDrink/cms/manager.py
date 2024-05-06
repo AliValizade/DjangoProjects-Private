@@ -1,5 +1,6 @@
+import datetime
 from django.db import models
-from django.db.models import Sum, When, Case, IntegerField
+from django.db.models import Sum, When, Case, IntegerField, Q
 
 class HerbManager(models.Manager):
     def get_suitable_herbs(self, user_profile, diseases):
@@ -8,10 +9,30 @@ class HerbManager(models.Manager):
             suitability_herb__score=-100
         ).values_list('id', flat=True).distinct()
 
-        # فیلتر کردن گیاهان بر اساس حساسیت طعمی کاربر
+        # Filter herbs based on the user's taste sensitivity
         if user_profile.taste_sensitivity:
             forbidden_herbs = forbidden_herbs.union(
                 self.get_queryset().filter(herb_flavor=user_profile.taste_sensitivity).values_list('id', flat=True)
+            )
+
+        # Determine the current season based on the system date
+        current_month = datetime.datetime.now().month
+        if 3 <= current_month <= 5:
+            current_season = 'SPRING'
+        elif 6 <= current_month <= 8:
+            current_season = 'SUMMER'
+        elif 9 <= current_month <= 11:
+            current_season = 'AUTUMN'
+        else:
+            current_season = 'WINTER'
+        
+        # Filter herbs based on the user's seasonal sensitivity and the herb's seasonal rating
+        if user_profile.seasonal_allergy == current_season:
+            forbidden_herbs = forbidden_herbs.union(
+                self.get_queryset().filter(
+                    Q(seasonal_scores__season=current_season) & 
+                    Q(seasonal_scores__score__lt=0)
+                ).values_list('id', flat=True)
             )
 
         suitable_herbs = self.get_queryset().exclude(
@@ -31,8 +52,6 @@ class HerbManager(models.Manager):
         # Store scores in a dictionary
         herb_scores = {herb.id: herb.total_score for herb in suitable_herbs}
 
-        print('1->', herb_scores)
-
         # Check for interactions and remove herb with lower scores
         for herb in list(suitable_herbs):
             interacting_herbs = herb.interaction_herb.filter(
@@ -46,6 +65,5 @@ class HerbManager(models.Manager):
         final_recommendations = [
             (herb, herb_scores[herb.id]) for herb in suitable_herbs if herb.id in herb_scores
         ]
-        print('2->',final_recommendations)
         
         return final_recommendations
