@@ -11,12 +11,12 @@ class SuitabilityInline(admin.TabularInline):
 
 class SeasonalScoreInline(admin.TabularInline):
     model = models.SeasonalScore
-    extra = 4
+    extra = 2
 
 
 @admin.register(models.Herb)
 class HerbAdmin(admin.ModelAdmin):
-    list_display = ('name', 'temperament')
+    list_display = ('id', 'name', 'temperament')
     fields = ('name', 'temperament')
     inlines = [SuitabilityInline, SeasonalScoreInline]  
 
@@ -24,6 +24,11 @@ class HerbAdmin(admin.ModelAdmin):
 @admin.register(models.Disease)
 class DiseaseAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', ]
+
+
+@admin.register(models.HerbInteraction)
+class HerbInteractionAdmin(admin.ModelAdmin):
+    list_display = ['id', 'herb1', 'herb2', 'description', ]
 
 
 @admin.register(models.SeasonalScore)

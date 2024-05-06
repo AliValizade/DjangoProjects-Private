@@ -23,9 +23,9 @@ Disease form
                     <div class="col-md-12">
                         <div class="card shadow my-3 p-5">
                             <h2 id="recommendations">Recommended Herbs</h2>
-                            {% if herbs %}
+                            {% if final_recommendations %}
                                 <ul>
-                                    {% for herb in herbs %}
+                                    {% for herb in final_recommendations %}
                                     <li>{{ herb.name }} (Score: {{ herb.total_score }})</li>
                                     {% endfor %}
                                 </ul>

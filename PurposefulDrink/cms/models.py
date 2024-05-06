@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Sum, F, Q, Exists, OuterRef
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from .manager import HerbManager
@@ -45,6 +45,18 @@ class SeasonalScore(models.Model):
         unique_together = ('herb', 'season')
 
 
+class HerbInteraction(models.Model):
+    herb1 = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='interactions_herb1')
+    herb2 = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='interactions_herb2')
+    description = models.TextField(verbose_name="توضیح تداخل")
+
+    class Meta:
+        unique_together = ('herb1', 'herb2')
+
+    def __str__(self) -> str:
+        return f"تداخل بین {self.herb1.name} و {self.herb2.name}"
+    
+
 class UserDisease(models.Model):
     user = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE, verbose_name="کاربر")
     disease = models.ForeignKey('Disease', on_delete=models.CASCADE, verbose_name="بیماری")
@@ -55,7 +67,10 @@ class UserDisease(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.disease}"
-    
+
+def validate_score(value):
+    if value not in [1, 2, 3, -100]:
+        raise ValidationError('امتیاز باید 1، 2، 3 یا -100 باشد.')
 class Suitability(models.Model):
     NEGATIVE_EFFECT_CHOICES = [
         ('consultation_needed', 'نیاز به مشورت به پزشک دارد'),
@@ -65,7 +80,7 @@ class Suitability(models.Model):
     herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='suitability_herb')
     disease = models.ForeignKey(Disease, on_delete=models.CASCADE, related_name='suitability_disease')
     negative_effects = models.CharField(max_length=100, choices=NEGATIVE_EFFECT_CHOICES, verbose_name="حالت منفی", null=True, blank=True)
-    score = models.IntegerField()  # 1 to 5 for suitability, -100 for prohibited
+    score = models.IntegerField(validators=[validate_score])  # 1 to 3 for suitability, -100 for prohibited
 
     class Meta:
         unique_together = ('herb', 'disease')  # Ensuring that each plant and disease combination is unique

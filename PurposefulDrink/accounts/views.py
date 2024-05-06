@@ -42,7 +42,7 @@ class LoginRegisterView(TemplateView):
             if user is not None:
                 login(request, user)
                 messages.success(request, 'وارد شدید', 'success')
-                return redirect('home')
+                return redirect('recommendations')
         return self.render_to_response(self.get_context_data())
 
 
