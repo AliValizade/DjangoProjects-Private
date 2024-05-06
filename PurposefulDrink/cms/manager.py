@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Sum, When, Case, IntegerField, F
+from django.db.models import Sum, When, Case, IntegerField
 
 class HerbManager(models.Manager):
     def get_suitable_herbs(self, diseases):
@@ -22,25 +22,24 @@ class HerbManager(models.Manager):
             )
         ).filter(total_score__gt=0)
 
-        interactions = self.check_herb_interactions(suitable_herbs)
-        for herb1, herb2, _ in interactions:
-            if herb1.total_score <= herb2.total_score:
-                suitable_herbs = suitable_herbs.exclude(id=herb1.id)
-            else:
-                suitable_herbs = suitable_herbs.exclude(id=herb2.id)
+        # Store scores in a dictionary
+        herb_scores = {herb.id: herb.total_score for herb in suitable_herbs}
 
-        return suitable_herbs.order_by('-total_score')
+        print('1->', herb_scores)
 
-    def check_herb_interactions(self, suitable_herbs):
-        from .models import HerbInteraction
-
-        interactions = []
-        herb_ids_with_scores = suitable_herbs.values_list('id', flat=True)
-        for herb_id in herb_ids_with_scores:
-            interactions_qs = HerbInteraction.objects.filter(herb1__id=herb_id)
-            for interaction in interactions_qs:
-                if interaction.herb2.id in herb_ids_with_scores:
-                    herb1 = suitable_herbs.get(id=herb_id)
-                    herb2 = suitable_herbs.get(id=interaction.herb2.id)
-                    interactions.append((herb1, herb2, interaction.description))
-        return interactions
+        # Check for interactions and remove herb with lower scores
+        for herb in list(suitable_herbs):
+            interacting_herbs = herb.interaction_herb.filter(
+                id__in=herb_scores.keys()
+            )
+            for interacting_herb in interacting_herbs:
+                if herb_scores.get(interacting_herb.id, 0) >= herb_scores[herb.id]:
+                    del herb_scores[herb.id]
+                    break
+        # Returning suitable herbs with their scores
+        final_recommendations = [
+            (herb, herb_scores[herb.id]) for herb in suitable_herbs if herb.id in herb_scores
+        ]
+        print('2->',final_recommendations)
+        
+        return final_recommendations

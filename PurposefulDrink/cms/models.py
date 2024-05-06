@@ -28,13 +28,13 @@ class Herb(models.Model):
     ]
     name = models.CharField(max_length=100)
     temperament = models.CharField(max_length=10, choices=TEMPERAMENT_CHOICES, default='COLD', help_text='Select the temperament category of the herb.')
-    inappropriate_age_ranges = models.ManyToManyField(AgeRange, verbose_name="بازه‌های سنی نامناسب", blank=True)
+    inappropriate_age_ranges = models.ManyToManyField('AgeRange', verbose_name="بازه‌های سنی نامناسب", blank=True)
+    interaction_herb = models.ManyToManyField('self', verbose_name="تداخل گیاهان", blank=True, symmetrical=False)
 
     objects = HerbManager()
 
     def __str__(self) -> str:
         return self.name
-
 
 class SeasonalScore(models.Model):
     SEASON_CHOICES = [
@@ -55,16 +55,16 @@ class SeasonalScore(models.Model):
         unique_together = ('herb', 'season')
 
 
-class HerbInteraction(models.Model):
-    herb1 = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='interactions_herb1')
-    herb2 = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='interactions_herb2')
-    description = models.TextField(verbose_name="توضیح تداخل")
+# class HerbInteraction(models.Model):
+#     herb1 = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='interactions_herb1')
+#     herb2 = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='interactions_herb2')
+#     description = models.TextField(verbose_name="توضیح تداخل")
 
-    class Meta:
-        unique_together = ('herb1', 'herb2')
+#     class Meta:
+#         unique_together = ('herb1', 'herb2')
 
-    def __str__(self) -> str:
-        return f"تداخل بین {self.herb1.name} و {self.herb2.name}"
+#     def __str__(self) -> str:
+#         return f"تداخل بین {self.herb1.name} و {self.herb2.name}"
     
 
 class UserDisease(models.Model):
