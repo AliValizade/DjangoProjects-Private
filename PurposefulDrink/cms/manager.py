@@ -2,11 +2,17 @@ from django.db import models
 from django.db.models import Sum, When, Case, IntegerField
 
 class HerbManager(models.Manager):
-    def get_suitable_herbs(self, diseases):
+    def get_suitable_herbs(self, user_profile, diseases):
         forbidden_herbs = self.get_queryset().filter(
             suitability_herb__disease__in=diseases, 
             suitability_herb__score=-100
         ).values_list('id', flat=True).distinct()
+
+        # فیلتر کردن گیاهان بر اساس حساسیت طعمی کاربر
+        if user_profile.taste_sensitivity:
+            forbidden_herbs = forbidden_herbs.union(
+                self.get_queryset().filter(herb_flavor=user_profile.taste_sensitivity).values_list('id', flat=True)
+            )
 
         suitable_herbs = self.get_queryset().exclude(
             id__in=forbidden_herbs

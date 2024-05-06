@@ -26,7 +26,14 @@ class Herb(models.Model):
         ('HOT', 'گرم'),
         ('BOTH', 'هردو'),
     ]
+    HERB_FLAVOR_CHOICES = {
+        ("SOUR", "ترش"), 
+        ("SWEET", "شیرین"),
+        ("FAST", "تند"),
+        ("BITTER", "تلخ"),
+    }
     name = models.CharField(max_length=100)
+    herb_flavor = models.CharField(max_length=10, choices=HERB_FLAVOR_CHOICES, blank=True, help_text='Select the flavor of the herb.')
     temperament = models.CharField(max_length=10, choices=TEMPERAMENT_CHOICES, default='COLD', help_text='Select the temperament category of the herb.')
     inappropriate_age_ranges = models.ManyToManyField('AgeRange', verbose_name="بازه‌های سنی نامناسب", blank=True)
     interaction_herb = models.ManyToManyField('self', verbose_name="تداخل گیاهان", blank=True, symmetrical=False)

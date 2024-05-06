@@ -16,8 +16,8 @@ class SeasonalScoreInline(admin.TabularInline):
 
 @admin.register(models.Herb)
 class HerbAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'temperament', 'get_inappropriate_age_ranges', 'get_interaction_herbs', )
-    fields = ['name', 'temperament', 'inappropriate_age_ranges', 'interaction_herb']
+    list_display = ('id', 'name', 'herb_flavor', 'temperament', 'get_inappropriate_age_ranges', 'get_interaction_herbs', )
+    fields = ['name', 'temperament', 'herb_flavor', 'inappropriate_age_ranges', 'interaction_herb']
     inlines = [SuitabilityInline, SeasonalScoreInline]  
 
     def get_inappropriate_age_ranges(self, obj):

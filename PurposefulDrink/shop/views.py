@@ -8,8 +8,9 @@ class RecommendHerbsView(FormView):
 
     def form_valid(self, form):
         selected_diseases = form.cleaned_data['diseases']
+        user_profile = self.request.user.profile
         
-        final_recommendations = Herb.objects.get_suitable_herbs(selected_diseases)
+        final_recommendations = Herb.objects.get_suitable_herbs(user_profile, selected_diseases)
         
         forbidden_herbs = Suitability.objects.filter(
             disease__in=selected_diseases, score=-100
