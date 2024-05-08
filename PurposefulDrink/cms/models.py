@@ -12,13 +12,20 @@ class Disease(models.Model):
         return self.name
 
 
-class AgeRange(models.Model):
-    min_age = models.IntegerField(verbose_name="حداقل سن")
-    max_age = models.IntegerField(verbose_name="حداکثر سن")
+class AgeCategory(models.Model):
+    CATEGORY_CHOICES = [
+        ('BABY', 'خردسال'),
+        ('CHILD', 'کودک'),
+        ('TEEN', 'نوجوان'),
+        ('ADULT', 'جوان'),
+        ('MIDDLE_AGED', 'میانسال'),
+        ('ELDER', 'سالمند'),
+    ]
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, unique=True, blank=True)
 
-    def __str__(self) -> str:
-        return f"{self.min_age} تا {self.max_age} سال"
-    
+    def __str__(self):
+        return self.get_category_display()
+
 
 class Herb(models.Model):
     TEMPERAMENT_CHOICES = [
@@ -35,13 +42,14 @@ class Herb(models.Model):
     name = models.CharField(max_length=100)
     herb_flavor = models.CharField(max_length=10, choices=HERB_FLAVOR_CHOICES, blank=True, help_text='Select the flavor of the herb.')
     temperament = models.CharField(max_length=10, choices=TEMPERAMENT_CHOICES, default='COLD', help_text='Select the temperament category of the herb.')
-    inappropriate_age_ranges = models.ManyToManyField('AgeRange', verbose_name="بازه‌های سنی نامناسب", blank=True)
+    inappropriate_age_ranges = models.ManyToManyField('AgeCategory', verbose_name="بازه‌های سنی نامناسب", blank=True)
     interaction_herb = models.ManyToManyField('self', verbose_name="تداخل گیاهان", blank=True, symmetrical=False)
 
     objects = HerbManager()
 
     def __str__(self) -> str:
         return self.name
+
 
 class SeasonalScore(models.Model):
     SEASON_CHOICES = [
@@ -62,18 +70,6 @@ class SeasonalScore(models.Model):
         unique_together = ('herb', 'season')
 
 
-# class HerbInteraction(models.Model):
-#     herb1 = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='interactions_herb1')
-#     herb2 = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='interactions_herb2')
-#     description = models.TextField(verbose_name="توضیح تداخل")
-
-#     class Meta:
-#         unique_together = ('herb1', 'herb2')
-
-#     def __str__(self) -> str:
-#         return f"تداخل بین {self.herb1.name} و {self.herb2.name}"
-    
-
 class UserDisease(models.Model):
     user = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE, verbose_name="کاربر")
     disease = models.ForeignKey('Disease', on_delete=models.CASCADE, verbose_name="بیماری")
@@ -84,6 +80,7 @@ class UserDisease(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.disease}"
+
 
 def validate_score(value):
     if value not in [1, 2, 3, -100]:
@@ -104,6 +101,7 @@ class Suitability(models.Model):
 
     def __str__(self) -> str:
         return f"{self.herb} Score for {self.disease} is {self.score} "
+
     
 class NeutralPackage(models.Model):
     name = models.CharField(max_length=100)

@@ -4,6 +4,7 @@ from django.db.models import Sum, When, Case, IntegerField, Q
 
 class HerbManager(models.Manager):
     def get_suitable_herbs(self, user_profile, diseases):
+        from .models import AgeCategory
         forbidden_herbs = self.get_queryset().filter(
             suitability_herb__disease__in=diseases, 
             suitability_herb__score=-100
@@ -13,6 +14,17 @@ class HerbManager(models.Manager):
         if user_profile.taste_sensitivity:
             forbidden_herbs = forbidden_herbs.union(
                 self.get_queryset().filter(herb_flavor=user_profile.taste_sensitivity).values_list('id', flat=True)
+            )
+
+        # Filter plants based on the user's age category
+        if user_profile.age_category:
+            inappropriate_age_ranges_ids = AgeCategory.objects.filter(
+                category=user_profile.age_category
+            ).values_list('id', flat=True)
+            forbidden_herbs = forbidden_herbs.union(
+                self.get_queryset().filter(
+                    inappropriate_age_ranges__in=inappropriate_age_ranges_ids
+                ).values_list('id', flat=True)
             )
 
         # Determine the current season based on the system date

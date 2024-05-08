@@ -29,13 +29,16 @@ class HerbAdmin(admin.ModelAdmin):
     get_inappropriate_age_ranges.short_description = 'بازه‌های سنی نامناسب'
     get_interaction_herbs.short_description = 'تداخل گیاهان'
 
+
 @admin.register(models.Disease)
 class DiseaseAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', ]
 
-@admin.register(models.AgeRange)
-class AgeRangeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'min_age', 'max_age',]
+
+@admin.register(models.AgeCategory)
+class AgeCategoryAdmin(admin.ModelAdmin):
+    list_display = ['id', 'category', ]
+
 
 @admin.register(models.SeasonalScore)
 class SeasonalScoreAdmin(admin.ModelAdmin):
