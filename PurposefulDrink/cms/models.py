@@ -12,19 +12,12 @@ class Disease(models.Model):
         return self.name
 
 
-class AgeCategory(models.Model):
-    CATEGORY_CHOICES = [
-        ('BABY', 'خردسال'),
-        ('CHILD', 'کودک'),
-        ('TEEN', 'نوجوان'),
-        ('ADULT', 'جوان'),
-        ('MIDDLE_AGED', 'میانسال'),
-        ('ELDER', 'سالمند'),
-    ]
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, unique=True, blank=True)
+class AgeRange(models.Model):
+    min_age = models.IntegerField(verbose_name="حداقل سن")
+    max_age = models.IntegerField(verbose_name="حداکثر سن")
 
-    def __str__(self):
-        return self.get_category_display()
+    def __str__(self) -> str:
+        return f"{self.min_age} تا {self.max_age} سال"
 
 
 class Herb(models.Model):
@@ -42,7 +35,7 @@ class Herb(models.Model):
     name = models.CharField(max_length=100)
     herb_flavor = models.CharField(max_length=10, choices=HERB_FLAVOR_CHOICES, blank=True, help_text='Select the flavor of the herb.')
     temperament = models.CharField(max_length=10, choices=TEMPERAMENT_CHOICES, default='COLD', help_text='Select the temperament category of the herb.')
-    inappropriate_age_ranges = models.ManyToManyField('AgeCategory', verbose_name="بازه‌های سنی نامناسب", blank=True)
+    inappropriate_age_ranges = models.ManyToManyField('AgeRange', verbose_name="بازه‌های سنی نامناسب", blank=True)
     interaction_herb = models.ManyToManyField('self', verbose_name="تداخل گیاهان", blank=True, symmetrical=False)
 
     objects = HerbManager()

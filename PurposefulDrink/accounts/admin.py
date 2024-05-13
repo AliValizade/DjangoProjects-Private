@@ -21,7 +21,7 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ('is_admin', )
 
     fieldsets = (
-        ('Main', {'fields':('email', 'phone_number', 'fullname', 'password', 'address', 'gender')}),
+        ('Main', {'fields':('email', 'phone_number', 'fullname', 'password', 'address', 'gender', 'date_of_birth',)}),
         ('Permissions', {'fields':('is_active', 'is_admin')}),
     )
 

@@ -2,9 +2,14 @@ import datetime
 from django.db import models
 from django.db.models import Sum, When, Case, IntegerField, Q
 
+
+def calculate_age(birthdate):
+    today = datetime.date.today()
+    return today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+
 class HerbManager(models.Manager):
     def get_suitable_herbs(self, user_profile, diseases):
-        from .models import AgeCategory
+        from .models import AgeRange
         forbidden_herbs = self.get_queryset().filter(
             suitability_herb__disease__in=diseases, 
             suitability_herb__score=-100
@@ -16,16 +21,17 @@ class HerbManager(models.Manager):
                 self.get_queryset().filter(herb_flavor=user_profile.taste_sensitivity).values_list('id', flat=True)
             )
 
-        # Filter plants based on the user's age category
-        if user_profile.age_category:
-            inappropriate_age_ranges_ids = AgeCategory.objects.filter(
-                category=user_profile.age_category
+        # Filter plants based on the user's age
+        user_age = calculate_age(user_profile.user.date_of_birth)
+        inappropriate_age_ranges = AgeRange.objects.filter(
+            min_age__lte=user_age, max_age__gte=user_age
+        ).values_list('id', flat=True)
+
+        forbidden_herbs = forbidden_herbs.union(
+            self.get_queryset().filter(
+                inappropriate_age_ranges__in=inappropriate_age_ranges
             ).values_list('id', flat=True)
-            forbidden_herbs = forbidden_herbs.union(
-                self.get_queryset().filter(
-                    inappropriate_age_ranges__in=inappropriate_age_ranges_ids
-                ).values_list('id', flat=True)
-            )
+        )
 
         # Determine the current season based on the system date
         current_month = datetime.datetime.now().month

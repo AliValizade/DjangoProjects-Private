@@ -35,9 +35,9 @@ class DiseaseAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', ]
 
 
-@admin.register(models.AgeCategory)
-class AgeCategoryAdmin(admin.ModelAdmin):
-    list_display = ['id', 'category', ]
+@admin.register(models.AgeRange)
+class AgeRangeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'min_age', 'max_age', ]
 
 
 @admin.register(models.SeasonalScore)

@@ -15,6 +15,7 @@ class CustomUser(AbstractBaseUser):
     fullname = models.CharField(max_length=100, default=' ')
     address = models.TextField(blank=True, null=True)
     gender = models.CharField(max_length=100, choices=GENDER_CHOICE, default='male')
+    date_of_birth = models.DateField(verbose_name="تاریخ تولد", blank=True, null=True)
 
     objects = UserManager()
 
@@ -51,14 +52,7 @@ class Information(models.Model):
         "FAST": "تند",
         "BITTER": "تلخ"
     }
-    AGE_CATEGORY_CHOICES = {
-        "BABY": "خردسال",
-        "CHILD": "کودک",
-        "TEEN": "نوجوان",
-        "ADULT": "جوان",
-        "MIDDLE_AGED": "میانسال",
-        "ELDER": "سالمند"
-    }
+    
     POLLUTION_LEVEL_CHOICES = {
         "LOW": "کم",
         "MEDIUM": "متوسط",
@@ -81,7 +75,6 @@ class Information(models.Model):
     job_category = models.CharField(max_length=55, choices=JOB_TYPE_CHOICES, verbose_name="شغل کاربر")
     seasonal_allergy = models.CharField(max_length=10, choices=SEASONAL_ALLERGY_CHOICES, verbose_name="آلرژی فصلی ", null=True, blank=True)
     taste_sensitivity = models.CharField(max_length=10, choices=TASTE_SENSITIVITY_CHOICES, verbose_name="حساسیت به طعم", null=True, blank=True)
-    age_category = models.CharField(max_length=11, choices=AGE_CATEGORY_CHOICES, verbose_name="رده سنی ") 
 
     class Meta:
         abstract = True
