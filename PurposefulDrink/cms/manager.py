@@ -59,7 +59,7 @@ class HerbManager(models.Manager):
             total_score=Sum(
                 Case(
                     When(suitability_herb__disease__in=diseases,
-                         suitability_herb__score__gt=0,
+                         suitability_herb__score__gt=-5,
                          then='suitability_herb__score'),
                     default=0,
                     output_field=IntegerField()

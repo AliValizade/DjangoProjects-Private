@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django import forms
 
 from . import models
 
@@ -30,9 +31,18 @@ class HerbAdmin(admin.ModelAdmin):
     get_interaction_herbs.short_description = 'تداخل گیاهان'
 
 
+class DiseaseAdminForm(forms.ModelForm):
+    class Meta:
+        model = models.Disease
+        fields = '__all__'
+        widgets = {
+            'similar_names': forms.Textarea(attrs={'cols': 80, 'rows': 20}),
+        }
+
 @admin.register(models.Disease)
 class DiseaseAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', ]
+    form = DiseaseAdminForm
+    list_display = ['id', 'name', 'similar_names', ]
 
 
 @admin.register(models.AgeRange)

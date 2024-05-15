@@ -1,12 +1,13 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from .manager import HerbManager
 
 class Disease(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(verbose_name="توضیحات", default='Description')
+    name = models.CharField(verbose_name='نام بیماری', max_length=100)
+    similar_names = ArrayField(models.CharField(max_length=100), verbose_name="نام‌های مشابه", blank=True, null=True)
 
     def __str__(self) -> str:
         return self.name
@@ -17,7 +18,7 @@ class AgeRange(models.Model):
     max_age = models.IntegerField(verbose_name="حداکثر سن")
 
     def __str__(self) -> str:
-        return f"{self.min_age} تا {self.max_age} سال"
+        return f"{self.min_age} - {self.max_age} سال"
 
 
 class Herb(models.Model):
@@ -32,11 +33,11 @@ class Herb(models.Model):
         ("FAST", "تند"),
         ("BITTER", "تلخ"),
     }
-    name = models.CharField(max_length=100)
-    herb_flavor = models.CharField(max_length=10, choices=HERB_FLAVOR_CHOICES, blank=True, help_text='Select the flavor of the herb.')
-    temperament = models.CharField(max_length=10, choices=TEMPERAMENT_CHOICES, default='COLD', help_text='Select the temperament category of the herb.')
+    name = models.CharField(verbose_name='نام گیاه', max_length=100)
+    herb_flavor = models.CharField(verbose_name='مزه گیاه', max_length=10, choices=HERB_FLAVOR_CHOICES, blank=True, help_text='Select the flavor of the herb.')
+    temperament = models.CharField(verbose_name='طبع گیاه', max_length=10, choices=TEMPERAMENT_CHOICES, default='COLD', help_text='Select the temperament category of the herb.')
     inappropriate_age_ranges = models.ManyToManyField('AgeRange', verbose_name="بازه‌های سنی نامناسب", blank=True)
-    interaction_herb = models.ManyToManyField('self', verbose_name="تداخل گیاهان", blank=True, symmetrical=False)
+    interaction_herb = models.ManyToManyField('self', verbose_name="تداخل گیاهان", blank=True, symmetrical=True)
 
     objects = HerbManager()
 
@@ -52,8 +53,8 @@ class SeasonalScore(models.Model):
         ('WINTER', 'زمستان'),
     ]
 
-    herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='seasonal_scores')
-    season = models.CharField(max_length=10, choices=SEASON_CHOICES)
+    herb = models.ForeignKey(Herb, verbose_name='گیاه', on_delete=models.CASCADE, related_name='seasonal_scores')
+    season = models.CharField(verbose_name='فصل', max_length=10, choices=SEASON_CHOICES)
     score = models.IntegerField(validators=[MinValueValidator(-3), MaxValueValidator(3)])
 
     def __str__(self) -> str:
@@ -76,18 +77,24 @@ class UserDisease(models.Model):
 
 
 def validate_score(value):
-    if value not in [1, 2, 3, -100]:
-        raise ValidationError('امتیاز باید 1، 2، 3 یا -100 باشد.')
+    if value not in [1, 2, 3, -1, -100]:
+        raise ValidationError('امتیاز باید 1، 2، 3 یا -1 و -100 باشد.')
 class Suitability(models.Model):
-    NEGATIVE_EFFECT_CHOICES = [
+    SCORE_CHOICES = [
+        (3, 'درمان اول'),
+        (2, 'درمان دوم'),
+        (1, 'درمان سوم'),
+        (-1, 'توصیه نمیشود'),
+        (-100, 'قدغن است'),
+    ]
+    ALERT_STATES_CHOICES = [
         ('consultation_needed', 'نیاز به مشورت به پزشک دارد'),
         ('contradiction', 'تعارض دارد'),
-        ('prohibited', 'قدغن است')
     ]
-    herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='suitability_herb')
-    disease = models.ForeignKey(Disease, on_delete=models.CASCADE, related_name='suitability_disease')
-    negative_effects = models.CharField(max_length=100, choices=NEGATIVE_EFFECT_CHOICES, verbose_name="حالت منفی", null=True, blank=True)
-    score = models.IntegerField(validators=[validate_score])  # 1 to 3 for suitability, -100 for prohibited
+    herb = models.ForeignKey(Herb, verbose_name='گیاه', on_delete=models.CASCADE, related_name='suitability_herb')
+    disease = models.ForeignKey(Disease, verbose_name='بیماری', on_delete=models.CASCADE, related_name='suitability_disease')
+    alert_states = models.CharField(max_length=100, choices=ALERT_STATES_CHOICES, verbose_name="حالات هشدار", null=True, blank=True)
+    score = models.IntegerField(choices=SCORE_CHOICES, verbose_name='اولویت درمان')  # 1 to 3 for suitability, -100 for prohibited
 
     class Meta:
         unique_together = ('herb', 'disease')  # Ensuring that each plant and disease combination is unique

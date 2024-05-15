@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block title %}
 Disease form
 {% endblock title %}
@@ -41,15 +43,7 @@ Disease form
                     <div class="col-md-12">
                         <div class="card shadow my-3 p-5">
                             <h2 id="recommendations">Forbidden Herbs</h2>
-                            {% comment %} {% if forbidden_herbs %}
-                                <ul>
-                                    {% for herb, disease in forbidden_herbs %}
-                                    <li><strong>{{ herb }}</strong> برای <strong>{{ disease }}</strong>  به شدت ممنوع است. </li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <p>هیچ ممنوعیت خاصی بر اساس بیماری های انتخابی شما وجود ندارد.</p>
-                            {% endif %} {% endcomment %}
+                            
                         </div>
                     </div>
                 </div>
@@ -59,15 +53,7 @@ Disease form
                     <div class="col-md-12">
                         <div class="card shadow my-3 p-5">
                             <h2 id="recommendations">Important recommendations</h2>
-                            {% comment %} {% if recommendations %}
-                                <div class="recommendations">
-                                    <ul>
-                                        {% for recommendation in recommendations %}
-                                        <li>{{ recommendation }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            {% endif %} {% endcomment %}
+                            
                         </div>
                     </div>
                 </div>
