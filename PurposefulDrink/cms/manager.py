@@ -32,7 +32,8 @@ class HerbManager(models.Manager):
         from .models import AgeRange
         user_age = calculate_age(date_of_birth)
         inappropriate_age_ranges = AgeRange.objects.filter(
-            min_age__lte=user_age, max_age__gte=user_age
+            min_age__lte=user_age, 
+            max_age__gte=user_age
         ).values_list('id', flat=True)
         return queryset.union(
             self.get_queryset().filter(
@@ -77,6 +78,7 @@ class HerbManager(models.Manager):
                 )
             )
         ).filter(total_score__gt=0)
+        
         return self.get_final_recommendations(suitable_herbs)
 
     def get_final_recommendations(self, suitable_herbs):
@@ -92,13 +94,14 @@ class HerbManager(models.Manager):
         return [(herb, herb_scores[herb.id]) for herb in sorted_herbs]
 
     def remove_interactions(self, suitable_herbs, herb_scores):
-        for herb in list(suitable_herbs):
-            interacting_herbs = herb.interaction_herb.filter(
-                id__in=herb_scores.keys()
-            )
+        suitable_herbs = suitable_herbs.prefetch_related('interaction_herb')
+        
+        for herb in suitable_herbs:
+            interacting_herbs = herb.interaction_herb.all()
             for interacting_herb in interacting_herbs:
-                if herb_scores.get(interacting_herb.id, 0) >= herb_scores[herb.id]:
-                    del herb_scores[herb.id]
+                if herb_scores.get(interacting_herb.id, 0) >= herb_scores.get(herb.id, 0):
+                    if herb.id in herb_scores:
+                        del herb_scores[herb.id]
                     break
         return suitable_herbs
 
