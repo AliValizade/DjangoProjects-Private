@@ -1,3 +1,4 @@
+# cms/manager.py
 import datetime
 from django.db import models
 from django.db.models import Sum, When, Case, IntegerField, Q
@@ -110,5 +111,5 @@ class HerbManager(models.Manager):
                 Q(alert_states__isnull=False)
             )
             alert_states_set = set(filtered_suitabilities.values_list('alert_states', flat=True))
-            processed_recommendations.append((herb, score, alert_states_set))
+            processed_recommendations.append((herb, score, alert_states_set))        
         return processed_recommendations

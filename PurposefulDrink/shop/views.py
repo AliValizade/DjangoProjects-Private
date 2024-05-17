@@ -12,13 +12,26 @@ class RecommendProductsView(FormView):
         user_profile = self.request.user.profile
         final_recommendations = Herb.objects.get_suitable_herbs_with_alerts(user_profile, selected_diseases)
 
+        herb_ids = [herb.id for herb, _, _ in final_recommendations]
+        products = Product.objects.filter(herb_id__in=herb_ids).select_related('herb')
+
         product_recommendations = []
-        for herb, score, alerts in final_recommendations:
-            products = Product.objects.filter(herb=herb)
-            for product in products:
-                product_recommendations.append((product, score, alerts))
+        for product in products:
+            for id, (herb, score, alerts) in enumerate(final_recommendations):
+                if product.herb_id == herb.id:
+                    treatment_label = ''
+                    if id == 0:
+                        treatment_label = 'درمان اول'
+                    elif id == 1:
+                        treatment_label = 'درمان دوم'
+                    elif id == 2:
+                        treatment_label = 'درمان سوم'
+                    product_recommendations.append((product, treatment_label, alerts))
 
-
+        # Sort the final recommendations by the treatment label
+        treatment_order = {'درمان اول': 1, 'درمان دوم': 2, 'درمان سوم': 3}
+        product_recommendations.sort(key=lambda x: treatment_order[x[1]])
+        
         context = self.get_context_data(form=form)
         context['final_recommendations'] = product_recommendations
         

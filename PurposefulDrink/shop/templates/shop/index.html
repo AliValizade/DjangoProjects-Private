@@ -27,10 +27,8 @@ Disease form
                             <h2 id="recommendations">Recommended Product</h2>
                             {% if final_recommendations %}
                                 <ul>
-                                    {% for product, score, alert  in final_recommendations %}
+                                    {% for product, treatment_label, alert  in final_recommendations %}
                                     <li>
-                                        {{ product.name }} (Score: {{ score }})
-                                        <span>Price: {{ product.price }}</span>
                                         {% for alert_state in alert %}
                                             {% if alert_state %}
                                                 {% if alert_state == 'consultation_needed' %}
@@ -40,6 +38,8 @@ Disease form
                                                 {% endif %}
                                             {% endif %}
                                         {% endfor %}
+                                        {{ product.name }} ({{ treatment_label }})
+                                        <span>قیمت: {{ product.price }}</span>
 
                                     </li>
                                     {% endfor %}
