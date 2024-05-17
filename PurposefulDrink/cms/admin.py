@@ -57,7 +57,7 @@ class SeasonalScoreAdmin(admin.ModelAdmin):
 
 @admin.register(models.Suitability)
 class SuitabilityAdmin(admin.ModelAdmin):
-    list_display = ['id', 'herb', 'disease', 'score', ]
+    list_display = ['id', 'herb', 'disease', 'score', 'alert_states', ]
 
 
 @admin.register(models.NeutralPackage)
