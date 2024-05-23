@@ -1,6 +1,12 @@
+from django.shortcuts import render
+from django.views import View
 from django.views.generic.edit import FormView
+
 from cms.models import Herb
-from .forms import DiseaseForm
+from cms.forms import DiseaseForm
+
+class ShopView(View):
+    pass
 
 class RecommendProductsView(FormView):
     template_name = 'shop/index.html'
@@ -9,8 +15,8 @@ class RecommendProductsView(FormView):
     def form_valid(self, form):
         from .models import Product
         selected_diseases = form.cleaned_data['diseases']
-        user_profile = self.request.user.profile
-        final_recommendations = Herb.objects.get_suitable_herbs_with_alerts(user_profile, selected_diseases)
+        user = self.request.user
+        final_recommendations = Herb.objects.get_suitable_herbs_with_alerts(user, selected_diseases)
 
         herb_ids = [herb.id for herb, _, _ in final_recommendations]
         products = Product.objects.filter(herb_id__in=herb_ids).select_related('herb')

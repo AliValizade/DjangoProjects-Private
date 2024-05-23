@@ -1,24 +1,53 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
-from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models import Sum
+from profile import Profile
+from typing import Dict, List
+from django.http import  QueryDict
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.urls import reverse
+from django.forms import ValidationError
+from cms.manager import DiseaseManager, HerbManager
 
-from .manager import HerbManager
 
 class Disease(models.Model):
-    name = models.CharField(verbose_name='نام بیماری', max_length=100)
-    similar_names = ArrayField(models.CharField(max_length=100), verbose_name="نام‌های مشابه", blank=True, null=True)
+    name = models.CharField(max_length=100, unique=True, verbose_name="نام بیماری")
 
+    objects = DiseaseManager()
+    
     def __str__(self) -> str:
         return self.name
+    
+    class Meta: 
+        indexes = [
+            models.Index(fields=['name'])
+        ]
+
+class AdditionalName(models.Model):
+    disease = models.ForeignKey("Disease", on_delete=models.CASCADE, related_name="additional_name")
+    name = models.CharField(max_length=100,unique=True, verbose_name="نام اضافی")
+    
+    def __str__(self) -> str:
+        return self.name
+    
+    class Meta: 
+        verbose_name = "Add Names Disease"
 
 
 class AgeRange(models.Model):
+    CATEGORY_CHOICES = [
+        ('BABY', 'خردسال'),
+        ('CHILD', 'کودک'),
+        ('TEEN', 'نوجوان'),
+        ('ADULT', 'جوان'),
+        ('MIDDLE_AGED', 'میانسال'),
+        ('ELDER', 'سالمند'),
+    ]
     min_age = models.IntegerField(verbose_name="حداقل سن")
     max_age = models.IntegerField(verbose_name="حداکثر سن")
-
+    name = models.CharField(choices=CATEGORY_CHOICES, max_length=20, verbose_name="نام رده سنی")
+    
     def __str__(self) -> str:
-        return f"{self.min_age} - {self.max_age} سال"
+        return f"{self.name}=>{self.min_age} - {self.max_age} سال"
 
 
 class Herb(models.Model):
@@ -37,12 +66,67 @@ class Herb(models.Model):
     herb_flavor = models.CharField(verbose_name='مزه گیاه', max_length=10, choices=HERB_FLAVOR_CHOICES, blank=True, help_text='Select the flavor of the herb.')
     temperament = models.CharField(verbose_name='طبع گیاه', max_length=10, choices=TEMPERAMENT_CHOICES, default='COLD', help_text='Select the temperament category of the herb.')
     inappropriate_age_ranges = models.ManyToManyField('AgeRange', verbose_name="بازه‌های سنی نامناسب", blank=True)
-    interaction_herb = models.ManyToManyField('self', verbose_name="تداخل گیاهان", blank=True, symmetrical=True)
+    interaction_herb = models.ManyToManyField('self', verbose_name="تداخل گیاهان", blank=True, symmetrical=True)    
 
     objects = HerbManager()
 
     def __str__(self) -> str:
         return self.name
+
+
+class JobScore(models.Model):
+    JOB_TYPE_CHOICES = (
+        ('STUDENT', 'دانشجو'),
+        ('EMPLOYEE', 'کارمند'),
+        ('WORKER', 'کارگر'),
+        ('SALESPERSON', 'فروشنده'),
+        ('SENSITIVE_JOBS', 'مشاغل حساس'),
+        ('HARD_JOBS', 'مشاغل سخت'),
+        ('ATHLETE', 'ورزشکار'),
+        ('HOUSEKEEPER', 'خانه دار'),
+        ('MANAGEMENT', 'مدیریت'),
+    )
+    SCORE_CHOICES = [
+        (2, 'عالی'),
+        (1, 'خوب'),
+        (0, 'خنثی'),
+        (-1, 'با احتیاط مصرف کنند'),
+        (-2, 'توصیه نمیشود'),
+    ]
+    herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='job_scores')
+    job_type = models.CharField(max_length=14, choices=JOB_TYPE_CHOICES)
+    score = models.IntegerField(choices=SCORE_CHOICES, default='0')
+
+    def __str__(self) -> str:
+        return f"{self.herb.name} - {self.score}"
+
+    class Meta:
+        unique_together = ('herb', 'job_type')
+
+
+class JobPollutionLevelScore(models.Model):
+    POLLUTION_LEVEL_CHOICES = {
+        "LOW": "کم",
+        "MEDIUM": "متوسط",
+        "MUCH": "زیاد",
+        'POLLUTED_JOBS': 'مشاغل آلوده'
+    }
+    SCORE_CHOICES = [
+        (2, 'اولویت اول'),
+        (1, 'اولویت دوم'),
+        (-1, 'با احتیاط مصرف شود'),
+        (-2, 'توصیه نمیشود'),
+    ]
+    herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='pollution_scores')
+    job_pollution_level = models.CharField(max_length=14, choices=POLLUTION_LEVEL_CHOICES, blank=True)
+    score = models.IntegerField(choices=SCORE_CHOICES, default='2')
+
+    def __str__(self) -> str:
+        return f"{self.herb.name} - {self.score}"
+
+    class Meta:
+        unique_together = ('herb', 'job_pollution_level')
+
 
 
 class SeasonalScore(models.Model):
@@ -52,10 +136,15 @@ class SeasonalScore(models.Model):
         ('AUTUMN', 'پاییز'),
         ('WINTER', 'زمستان'),
     ]
-
-    herb = models.ForeignKey(Herb, verbose_name='گیاه', on_delete=models.CASCADE, related_name='seasonal_scores')
-    season = models.CharField(verbose_name='فصل', max_length=10, choices=SEASON_CHOICES)
-    score = models.IntegerField(validators=[MinValueValidator(-3), MaxValueValidator(3)])
+    SCORE_CHOICES = [
+        (2, 'اولویت اول'),
+        (1, 'اولویت دوم'),
+        (-1, 'توصیه نمیشود'),
+        (-2, 'تشدیدکننده ی آلرژی'),
+    ]
+    herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='seasonal_scores')
+    season = models.CharField(max_length=10, choices=SEASON_CHOICES)
+    score = models.IntegerField(choices=SCORE_CHOICES)
 
     def __str__(self) -> str:
         return f"{self.herb.name} - {self.get_season_display()}"
@@ -64,21 +153,10 @@ class SeasonalScore(models.Model):
         unique_together = ('herb', 'season')
 
 
-class UserDisease(models.Model):
-    user = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE, verbose_name="کاربر")
-    disease = models.ForeignKey('Disease', on_delete=models.CASCADE, verbose_name="بیماری")
-    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="زمان ثبت")
-
-    class Meta:
-        unique_together = ('user', 'disease')  # Ensuring that each user and disease combination is unique
-
-    def __str__(self):
-        return f"{self.user} - {self.disease}"
-
-
 def validate_score(value):
-    if value not in [1, 2, 3, -1, -100]:
-        raise ValidationError('امتیاز باید 1، 2، 3 یا -1 و -100 باشد.')
+    if value not in [1, 2, 3, -100]:
+        raise ValidationError('امتیاز باید 1، 2، 3 یا -1 و -100 باشد.')   
+
 class Suitability(models.Model):
     SCORE_CHOICES = [
         (3, 'درمان اول'),
@@ -99,14 +177,49 @@ class Suitability(models.Model):
     class Meta:
         unique_together = ('herb', 'disease')  # Ensuring that each plant and disease combination is unique
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.herb} Score for {self.disease} is {self.score} "
 
+
+class Post(models.Model):
+    author = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='uposts')
+    body = models.TextField()
+    slug = models.SlugField()
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True, null=True , blank=True)
+
+    class Meta:
+        ordering = ('-created', )
+
+    def __str__(self):
+        return self.slug
     
-class NeutralPackage(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField()
+    def get_absolute_url(self):
+        return reverse("cms:post", kwargs={"pk": self.pk, 'slug': self.slug})
+    
+
+class Comment(models.Model):
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='ucomments')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name= 'pcomments')
+    reply = models.ForeignKey('self', on_delete=models.CASCADE, related_name='rcomments')
+    is_reply = models.BooleanField(default=False)
+    body = models.TextField(max_length=400)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.user} - {self.body[:30]}'
+
+
+class Vote(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='pvote')
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='uvote')
+
+    def __str__(self) -> str:
+        return f'{self.user} liked {self.post.slug}'
+    
+class Gallery(models.Model):
+    name = models.CharField(max_length=20)
+    image = models.ImageField()
 
     def __str__(self):
         return self.name
-

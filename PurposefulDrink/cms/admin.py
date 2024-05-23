@@ -1,65 +1,75 @@
 from django.contrib import admin
-from django import forms
-
-from . import models
+from .models import AdditionalName, AgeRange, Herb, Disease, Suitability, Post, Comment, Vote, SeasonalScore, JobScore, JobPollutionLevelScore
 
 
 class SuitabilityInline(admin.TabularInline):
-    model = models.Suitability
-    fields = ['disease', 'negative_effects', 'score']
+    model = Suitability
+    fields = ['disease', 'alert_states', 'score']
+    can_delete = True
+    search_fields = ("disease",)
+    # raw_id_fields = ('disease',) 
     extra = 1 
-    
+
 
 class SeasonalScoreInline(admin.TabularInline):
-    model = models.SeasonalScore
+    model = SeasonalScore
     extra = 2
 
+class JobScoreInline(admin.TabularInline):
+    model = JobScore
+    extra = 1
 
-@admin.register(models.Herb)
+
+class JobPollutionLevelScoreInline(admin.TabularInline):
+    model = JobPollutionLevelScore
+    extra = 1
+
+
+@admin.register(Herb)
 class HerbAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'herb_flavor', 'temperament', 'get_inappropriate_age_ranges', 'get_interaction_herbs', )
-    fields = ['name', 'temperament', 'herb_flavor', 'inappropriate_age_ranges', 'interaction_herb']
-    inlines = [SuitabilityInline, SeasonalScoreInline]  
-
+    inlines = [SuitabilityInline, SeasonalScoreInline, JobScoreInline, JobPollutionLevelScoreInline]  
+    
     def get_inappropriate_age_ranges(self, obj):
         return ", ".join([str(range) for range in obj.inappropriate_age_ranges.all()])
-    
+
     def get_interaction_herbs(self, obj):
         return ", ".join([herb.name for herb in obj.interaction_herb.all()])
-    
+
     get_inappropriate_age_ranges.short_description = 'بازه‌های سنی نامناسب'
     get_interaction_herbs.short_description = 'تداخل گیاهان'
 
 
-class DiseaseAdminForm(forms.ModelForm):
-    class Meta:
-        model = models.Disease
-        fields = '__all__'
-        widgets = {
-            'similar_names': forms.Textarea(attrs={'cols': 80, 'rows': 20}),
-        }
 
-@admin.register(models.Disease)
+class AdditionalNameInline(admin.TabularInline):
+    model = AdditionalName
+    extra = 2
+
+
+@admin.register(Disease)
 class DiseaseAdmin(admin.ModelAdmin):
-    form = DiseaseAdminForm
-    list_display = ['id', 'name', 'similar_names', ]
+    list_display = ['id', 'name']
+    inlines = [AdditionalNameInline]  
 
 
-@admin.register(models.AgeRange)
+@admin.register(AgeRange)
 class AgeRangeAdmin(admin.ModelAdmin):
     list_display = ['id', 'min_age', 'max_age', ]
 
+@admin.register(Suitability)
+class SuitabilityAdmin(admin.ModelAdmin):
+    list_display = ['id', 'herb', 'disease', 'score', 'alert_states', ]
 
-@admin.register(models.SeasonalScore)
+@admin.register(SeasonalScore)
 class SeasonalScoreAdmin(admin.ModelAdmin):
     list_display = ['id', 'herb', 'season', 'score', ]
 
 
-@admin.register(models.Suitability)
-class SuitabilityAdmin(admin.ModelAdmin):
-    list_display = ['id', 'herb', 'disease', 'score', 'alert_states', ]
 
 
-@admin.register(models.NeutralPackage)
-class NeutralAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', ]
+
+
+
+admin.site.register(Post)
+admin.site.register(Vote)
+admin.site.register(Comment)

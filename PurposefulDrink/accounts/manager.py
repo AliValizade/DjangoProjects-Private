@@ -1,31 +1,27 @@
+from datetime import date
 from django.contrib.auth.models import BaseUserManager
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, phone_number, email, fullname, address, disease, activity, job, gender, age, password):
+    '''
+    Just essentials informations other fields will be fill in the profile (dashboard part)
+    in summary this is our manager for our model user which we useable for create user and craete super user 
+    '''
+    def create_user(self, phone_number, email, fullname, password, job_pollution_level,
+                    job_category, seasonal_allergy, taste_sensitivity, age_category, gender,
+                    ):
         if not phone_number:
             raise ValueError('لطفا شماره تلفن خود را وارد نمایید')
         if not email:
             raise ValueError('لطفا ایمیل خود را وارد نمایید')
         if not fullname:
             raise ValueError('لطفا نام و نام خانوادگی خود را وارد نمایید')
-        if not disease:
-            raise ValueError('لطفا بیماری مورد نظر را انتخاب نمایید')
-        if not activity:
-            raise ValueError('لطفا سطح فعالیت خود را انتخاب نمایید')
-        if not job:
-            raise ValueError('لطفا نوع شغل خود را انتخاب نمایید')
-        if not gender:
-            raise ValueError('لطفا جنسیت خود را انتخاب نمایید')
-        if not age:
-            raise ValueError('لطفا سن خود را وارد کنید')
-        if not address:
-            raise ValueError('لطفا آدرس خود را وارد کنید')
         
-        
+        #validating email by using normalize_email 
         user = self.model(phone_number=phone_number, email=self.normalize_email(email), fullname = fullname,
-                          disease=disease, activity=activity, job=job, gender=gender, age=age)
-        user.set_password(password)
+                          job_pollution_level=job_pollution_level, job_category=job_category, seasonal_allergy=seasonal_allergy,
+                          taste_sensitivity=taste_sensitivity, age_category=age_category, gender=gender)
+        user.set_password(password) #using set password for filling password
         user.save(using=self._db)
         return user
     
@@ -36,3 +32,9 @@ class UserManager(BaseUserManager):
         user.is_superuser= True
         user.save(using=self._db)
         return user
+    
+    
+    @staticmethod
+    def calculate_age(birthdate: date):
+        today = date.today()
+        return today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))

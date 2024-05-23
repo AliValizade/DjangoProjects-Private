@@ -30,6 +30,12 @@ class Order(models.Model):
 
 
 class OrderItems(models.Model):
+    TYPE_CHOICE = [
+    ('دمنوش', 'دمنوش'),
+    ('بسته', 'بسته'),
+    ('فله', 'فله')
+    ]
+    type = models.CharField(max_length=6, choices=TYPE_CHOICE, default='دمنوش')
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='item')
     herb = models.ForeignKey(Herb, on_delete=models.CASCADE)
     price = models.PositiveBigIntegerField()
@@ -53,16 +59,16 @@ class DiscountCode(models.Model):
     
 
 class Product(models.Model):
-    PRODUCT_TYPES = (
-        ('DRINK', 'نوشیدنی'),
-        ('BAGGED', 'کیسه ای'),
-        ('BULK', 'فله ای'),
-    )
-    name = models.CharField(max_length=100)
-    type = models.CharField(max_length=10, choices=PRODUCT_TYPES, default='BULK')
+    TYPE_CHOICE = [
+        ('دمنوش', 'دمنوش'),
+        ('بسته', 'بسته'),
+        ('فله', 'فله')
+    ]
+    name = models.CharField(max_length=30)
     herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='products')
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.IntegerField()
     description = models.TextField()
+    type = models.CharField(max_length=6, choices=TYPE_CHOICE, default='دمنوش')
 
     def __str__(self):
         return self.name

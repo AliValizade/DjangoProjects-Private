@@ -1,9 +1,20 @@
 from django.contrib import admin
-from .models import Product
+from .models import Order, OrderItems, DiscountCode, Product
+# Register your models here.
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItems
+    raw_id_fields = ('herb', )
+
+@admin.register(Order)
+class AdminOrder(admin.ModelAdmin):
+    list_display = ('id', 'user', 'updated', 'paid')
+    list_filter = ('paid',)
+    inlines = (OrderItemInline, )
+
+
+admin.site.register(DiscountCode)
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'price', 'herb')  # فیلدهایی که می‌خواهید در لیست ادمین نمایش داده شوند
-    search_fields = ('name',)  # فیلدهایی که می‌خواهید قابلیت جستجو داشته باشند
-    list_filter = ('herb',)  # فیلدهایی که می‌خواهید برای فیلتر کردن استفاده شوند
-    ordering = ('name',)  # ترتیب نمایش بر اساس فیلد مشخص شده
+    list_display = ('id', 'name', 'description')
