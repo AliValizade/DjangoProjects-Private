@@ -17,4 +17,10 @@ admin.site.register(DiscountCode)
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'description')
+    list_display = ('id', 'name', 'display_herbs')
+
+    def display_herbs(self, obj):
+        return ", ".join([herb.name for herb in obj.herbs.all()])
+    
+    display_herbs.short_description = 'Herbs'
+

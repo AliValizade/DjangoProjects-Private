@@ -38,7 +38,8 @@ class HerbManager(models.Manager):
         forbidden_herbs = self.filter_by_taste(forbidden_herbs, user.taste_sensitivity)
         forbidden_herbs = self.filter_by_age(forbidden_herbs,  UserManager.calculate_age(user.date_of_birth))
         forbidden_herbs = self.filter_by_season(forbidden_herbs, user.seasonal_allergy)
-        forbidden_herbs = self.filter_by_job(forbidden_herbs, user.job_category)
+        forbidden_herbs = self.filter_by_job_type(forbidden_herbs, user.job_category)
+        forbidden_herbs = self.filter_by_job_type(forbidden_herbs, user.job_pollution_level)
         return forbidden_herbs
 
     def filter_by_disease(self, diseases):
@@ -76,7 +77,7 @@ class HerbManager(models.Manager):
             )
         return queryset
 
-    def filter_by_job(self, queryset, job_category):
+    def filter_by_job_type(self, queryset, job_category):
         from .models import JobScore
         if job_category:
             forbidden_herbs_by_job = JobScore.objects.filter(
@@ -84,6 +85,16 @@ class HerbManager(models.Manager):
                 score=-2
             ).values_list('herb_id', flat=True)
             return queryset.union(forbidden_herbs_by_job)
+        return queryset
+    
+    def filter_by_job_pollution_level(self, queryset, job_pollution_level):
+        from .models import JobScore
+        if job_pollution_level:
+            forbidden_herbs_by_job_pollution_level = JobScore.objects.filter(
+                job_pollution=job_pollution_level, 
+                score=-2
+            ).values_list('herb_id', flat=True)
+            return queryset.union(forbidden_herbs_by_job_pollution_level)
         return queryset
     
     def get_suitable_herbs(self, user, diseases):
@@ -101,25 +112,17 @@ class HerbManager(models.Manager):
                 )
             )
         ).filter(total_score__gt=0)
-        print('suit====>', suitable_herbs)
         return self.get_final_recommendations(suitable_herbs)
 
     def get_final_recommendations(self, suitable_herbs):
         herb_scores = {herb.id: herb.total_score for herb in suitable_herbs}
-        print('herb_scores=dic===>', herb_scores)
         suitable_herbs = self.remove_interactions(suitable_herbs, herb_scores)
-        print('suitable_herbs=>', suitable_herbs)
 
         sorted_herbs = sorted(
             suitable_herbs, 
             key=lambda herb: herb_scores.get(herb.id, 0), 
             reverse=True
         )[:3]
-        print('sorted_herbs===>', sorted_herbs)
-        for herb in sorted_herbs:
-            print('herb=>', herb)
-            print('herb-score=>', herb_scores[herb.id])
-        print('-----------------------------finish------------------------------')
 
         return [(herb, herb_scores[herb.id]) for herb in sorted_herbs]
 

@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views import View
 from django.views.generic.edit import FormView
+from django.db.models import Count
 
 from cms.models import Herb
 from cms.forms import DiseaseForm
@@ -19,12 +20,17 @@ class RecommendProductsView(FormView):
         final_recommendations = Herb.objects.get_suitable_herbs_with_alerts(user, selected_diseases)
 
         herb_ids = [herb.id for herb, _, _ in final_recommendations]
-        products = Product.objects.filter(herb_id__in=herb_ids).select_related('herb')
+
+        # Filter products with herb count 1
+        products = Product.objects.annotate(herb_count=Count('herbs')).filter(
+            herb_count__lte=1,
+            herbs__in=herb_ids
+        ).distinct().prefetch_related('herbs')
 
         product_recommendations = []
         for product in products:
             for id, (herb, score, alerts) in enumerate(final_recommendations):
-                if product.herb_id == herb.id:
+                if herb in product.herbs.all():
                     treatment_label = ''
                     if id == 0:
                         treatment_label = 'درمان اول'

@@ -112,20 +112,21 @@ class JobPollutionLevelScore(models.Model):
         'POLLUTED_JOBS': 'مشاغل آلوده'
     }
     SCORE_CHOICES = [
-        (2, 'اولویت اول'),
-        (1, 'اولویت دوم'),
+        (2, 'عالی'),
+        (1, 'خوب'),
+        (0, 'خنثی'),
         (-1, 'با احتیاط مصرف شود'),
         (-2, 'توصیه نمیشود'),
     ]
     herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='pollution_scores')
-    job_pollution_level = models.CharField(max_length=14, choices=POLLUTION_LEVEL_CHOICES, blank=True)
-    score = models.IntegerField(choices=SCORE_CHOICES, default='2')
+    job_pollution = models.CharField(max_length=14, choices=POLLUTION_LEVEL_CHOICES, blank=True)
+    score = models.IntegerField(choices=SCORE_CHOICES, default='0')
 
     def __str__(self) -> str:
         return f"{self.herb.name} - {self.score}"
 
     class Meta:
-        unique_together = ('herb', 'job_pollution_level')
+        unique_together = ('herb', 'job_pollution')
 
 
 

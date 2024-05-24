@@ -65,7 +65,7 @@ class Product(models.Model):
         ('فله', 'فله')
     ]
     name = models.CharField(max_length=30)
-    herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='products')
+    herbs = models.ManyToManyField(Herb, related_name='products')
     price = models.IntegerField()
     description = models.TextField()
     type = models.CharField(max_length=6, choices=TYPE_CHOICE, default='دمنوش')
