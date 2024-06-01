@@ -93,7 +93,7 @@ class JobScore(models.Model):
         (-100, 'قدغن است'),
     ]
     herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='job_scores')
-    job_type = models.CharField(max_length=14, choices=JOB_TYPE_CHOICES)
+    job_type = models.CharField(max_length=14, choices=JOB_TYPE_CHOICES, default='EMPLOYEE')
     score = models.IntegerField(choices=SCORE_CHOICES, default='0')
 
     def __str__(self) -> str:
@@ -117,7 +117,7 @@ class JobPollutionLevelScore(models.Model):
         (-100, 'قدغن است'),
     ]
     herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='pollution_scores')
-    job_pollution = models.CharField(max_length=14, choices=POLLUTION_LEVEL_CHOICES, blank=True)
+    job_pollution = models.CharField(max_length=14, choices=POLLUTION_LEVEL_CHOICES, default='MEDIUM')
     score = models.IntegerField(choices=SCORE_CHOICES, default='0')
 
     def __str__(self) -> str:

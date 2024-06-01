@@ -109,7 +109,7 @@ class HerbManager(models.Manager):
         return queryset
     
     def get_suitable_herbs(self, user, diseases):
-        from .models import SeasonalScore
+        from .models import SeasonalScore, JobScore
 
         forbidden_herbs = self.get_forbidden_herbs(user, diseases)
 
@@ -129,9 +129,18 @@ class HerbManager(models.Manager):
             total_seasonal_score=Sum('score')
         ).values('total_seasonal_score')
 
+        # Calculate Job_type score using Subquery
+        job_scores_subquery = JobScore.objects.filter(
+            herb=OuterRef('pk'),
+            score__gt=-100
+        ).values('herb').annotate(
+            total_job_type_score=Sum('score')
+        ).values('total_job_type_score')
+
         suitable_herbs = suitability_scores.annotate(
+            job_type_score=Subquery(job_scores_subquery, output_field=IntegerField(), default=Value(0)),
             seasonal_score=Subquery(seasonal_scores_subquery, output_field=IntegerField(), default=Value(0)),
-            total_score=F('suitability_score') + F('seasonal_score')
+            total_score=F('suitability_score') + F('seasonal_score') + F('job_type_score')
         ).filter(total_score__gt=0)
 
         print('suit-1: ==>', suitable_herbs)
