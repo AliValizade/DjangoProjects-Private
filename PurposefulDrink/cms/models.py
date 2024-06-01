@@ -87,11 +87,10 @@ class JobScore(models.Model):
         ('MANAGEMENT', 'مدیریت'),
     )
     SCORE_CHOICES = [
-        (2, 'عالی'),
         (1, 'خوب'),
         (0, 'خنثی'),
-        (-1, 'با احتیاط مصرف کنند'),
-        (-2, 'توصیه نمیشود'),
+        (-1, 'توصیه نمیشود'),
+        (-100, 'قدغن است'),
     ]
     herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='job_scores')
     job_type = models.CharField(max_length=14, choices=JOB_TYPE_CHOICES)
@@ -112,11 +111,10 @@ class JobPollutionLevelScore(models.Model):
         'POLLUTED_JOBS': 'مشاغل آلوده'
     }
     SCORE_CHOICES = [
-        (2, 'عالی'),
         (1, 'خوب'),
         (0, 'خنثی'),
-        (-1, 'با احتیاط مصرف شود'),
-        (-2, 'توصیه نمیشود'),
+        (-1, 'توصیه نمیشود'),
+        (-100, 'قدغن است'),
     ]
     herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='pollution_scores')
     job_pollution = models.CharField(max_length=14, choices=POLLUTION_LEVEL_CHOICES, blank=True)

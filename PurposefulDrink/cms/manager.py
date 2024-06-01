@@ -93,7 +93,7 @@ class HerbManager(models.Manager):
         if job_category:
             forbidden_herbs_by_job = JobScore.objects.filter(
                 job_type=job_category, 
-                score=-2
+                score=-100
             ).values_list('herb_id', flat=True)
             return queryset.union(forbidden_herbs_by_job)
         return queryset
@@ -103,7 +103,7 @@ class HerbManager(models.Manager):
         if job_pollution_level:
             forbidden_herbs_by_job_pollution_level = JobPollutionLevelScore.objects.filter(
                 job_pollution=job_pollution_level, 
-                score=-2
+                score=-100
             ).values_list('herb_id', flat=True)
             return queryset.union(forbidden_herbs_by_job_pollution_level)
         return queryset
@@ -113,7 +113,7 @@ class HerbManager(models.Manager):
 
         forbidden_herbs = self.get_forbidden_herbs(user, diseases)
 
-        # محاسبه امتیاز مناسب بودن
+        # Calculate the treatment priority score for the disease
         suitability_scores = self.get_queryset().filter(
             suitability_herb__disease__in=diseases,
             suitability_herb__score__gt=-5
@@ -121,7 +121,7 @@ class HerbManager(models.Manager):
             suitability_score=Sum('suitability_herb__score')
         )
 
-        # محاسبه امتیاز فصلی با استفاده از Subquery
+        # Calculate seasonal score using Subquery
         seasonal_scores_subquery = SeasonalScore.objects.filter(
             herb=OuterRef('pk'),
             score__gt=-100
