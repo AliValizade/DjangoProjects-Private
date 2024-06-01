@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from django.db.models import Sum, When, Case, IntegerField, Q
+from django.db.models import Sum, When, Case, IntegerField, Q, OuterRef, Subquery, F, Value
 from django.apps import apps
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -109,20 +109,33 @@ class HerbManager(models.Manager):
         return queryset
     
     def get_suitable_herbs(self, user, diseases):
+        from .models import SeasonalScore
+
         forbidden_herbs = self.get_forbidden_herbs(user, diseases)
-        suitable_herbs = self.get_queryset().exclude(
-            id__in=forbidden_herbs
-        ).annotate(
-            total_score=Sum(
-                Case(
-                    When(suitability_herb__disease__in=diseases,
-                         suitability_herb__score__gt=-5,
-                         then='suitability_herb__score'),
-                    default=0,
-                    output_field=IntegerField()
-                )
-            )
+
+        # محاسبه امتیاز مناسب بودن
+        suitability_scores = self.get_queryset().filter(
+            suitability_herb__disease__in=diseases,
+            suitability_herb__score__gt=-5
+        ).exclude(id__in=forbidden_herbs).annotate(
+            suitability_score=Sum('suitability_herb__score')
+        )
+
+        # محاسبه امتیاز فصلی با استفاده از Subquery
+        seasonal_scores_subquery = SeasonalScore.objects.filter(
+            herb=OuterRef('pk'),
+            score__gt=-100
+        ).values('herb').annotate(
+            total_seasonal_score=Sum('score')
+        ).values('total_seasonal_score')
+
+        suitable_herbs = suitability_scores.annotate(
+            seasonal_score=Subquery(seasonal_scores_subquery, output_field=IntegerField(), default=Value(0)),
+            total_score=F('suitability_score') + F('seasonal_score')
         ).filter(total_score__gt=0)
+
+        print('suit-1: ==>', suitable_herbs)
+
         return self.get_final_recommendations(suitable_herbs)
 
     def get_final_recommendations(self, suitable_herbs):
