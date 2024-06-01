@@ -129,7 +129,6 @@ class JobPollutionLevelScore(models.Model):
         unique_together = ('herb', 'job_pollution')
 
 
-
 class SeasonalScore(models.Model):
     SEASON_CHOICES = [
         ('SPRING', 'بهار'),
@@ -138,14 +137,20 @@ class SeasonalScore(models.Model):
         ('WINTER', 'زمستان'),
     ]
     SCORE_CHOICES = [
-        (2, 'اولویت اول'),
-        (1, 'اولویت دوم'),
+        (3, 'اولویت اول'),
+        (2, 'اولویت دوم'),
+        (1, 'اولویت سوم'),
         (-1, 'توصیه نمیشود'),
-        (-2, 'تشدیدکننده ی آلرژی'),
+        (-100, 'قدغن است'),
+    ]
+    ALLERGY_AGGRAVATOR_CHOISE = [
+        ('YES', 'بله'),
+        ('NO', 'خیر'),
     ]
     herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='seasonal_scores')
-    season = models.CharField(max_length=10, choices=SEASON_CHOICES)
-    score = models.IntegerField(choices=SCORE_CHOICES)
+    season = models.CharField(max_length=10, verbose_name='فصل', choices=SEASON_CHOICES)
+    allergy_aggravator = models.CharField(max_length=3, verbose_name='تشدیدکننده ی  آلرژی فصلی', choices=ALLERGY_AGGRAVATOR_CHOISE, default='NO')
+    score = models.IntegerField(choices=SCORE_CHOICES, verbose_name='اولویت درمان')
 
     def __str__(self) -> str:
         return f"{self.herb.name} - {self.get_season_display()}"
@@ -168,7 +173,6 @@ class Suitability(models.Model):
     ]
     ALERT_STATES_CHOICES = [
         ('consultation_needed', 'نیاز به مشورت به پزشک دارد'),
-        ('contradiction', 'تعارض دارد'),
     ]
     herb = models.ForeignKey(Herb, verbose_name='گیاه', on_delete=models.CASCADE, related_name='suitability_herb')
     disease = models.ForeignKey(Disease, verbose_name='بیماری', on_delete=models.CASCADE, related_name='suitability_disease')

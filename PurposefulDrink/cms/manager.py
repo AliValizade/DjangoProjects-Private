@@ -39,7 +39,7 @@ class HerbManager(models.Manager):
         forbidden_herbs = self.filter_by_age(forbidden_herbs,  UserManager.calculate_age(user.date_of_birth))
         forbidden_herbs = self.filter_by_season(forbidden_herbs, user.seasonal_allergy)
         forbidden_herbs = self.filter_by_job_type(forbidden_herbs, user.job_category)
-        forbidden_herbs = self.filter_by_job_type(forbidden_herbs, user.job_pollution_level)
+        forbidden_herbs = self.filter_by_job_pollution_level(forbidden_herbs, user.job_pollution_level)
         return forbidden_herbs
 
     def filter_by_disease(self, diseases):
@@ -66,15 +66,26 @@ class HerbManager(models.Manager):
             ).values_list('id', flat=True)
         )
 
-    def filter_by_season(self, queryset, seasonal_allergy):
+    def filter_by_season(self, queryset, user_seasonal_allergy):
         current_season = self.get_current_season()
-        if seasonal_allergy == current_season:
-            return queryset.union(
-                self.get_queryset().filter(
-                    Q(seasonal_scores__season=current_season) & 
-                    Q(seasonal_scores__score__lt=0)
-                ).values_list('id', flat=True)
-            )
+        
+        forbidden_by_allergy = self.get_queryset().filter(
+            seasonal_scores__season=current_season,
+            seasonal_scores__allergy_aggravator='YES'
+        ).values_list('id', flat=True)
+        print("forbidden_by_allergy: ", list(forbidden_by_allergy))
+
+        forbidden_by_season_score = self.get_queryset().filter(
+            seasonal_scores__season=current_season,
+            seasonal_scores__score=-100
+        ).values_list('id', flat=True)
+        print("forbidden_by_season_score: ", list(forbidden_by_season_score))
+
+        if user_seasonal_allergy == current_season:
+            queryset = queryset.union(forbidden_by_allergy)
+        
+        queryset = queryset.union(forbidden_by_season_score)
+        
         return queryset
 
     def filter_by_job_type(self, queryset, job_category):
@@ -88,9 +99,9 @@ class HerbManager(models.Manager):
         return queryset
     
     def filter_by_job_pollution_level(self, queryset, job_pollution_level):
-        from .models import JobScore
+        from .models import JobPollutionLevelScore
         if job_pollution_level:
-            forbidden_herbs_by_job_pollution_level = JobScore.objects.filter(
+            forbidden_herbs_by_job_pollution_level = JobPollutionLevelScore.objects.filter(
                 job_pollution=job_pollution_level, 
                 score=-2
             ).values_list('herb_id', flat=True)
@@ -170,12 +181,15 @@ class HerbManager(models.Manager):
     
     @staticmethod
     def get_current_season():
-        current_month = datetime.datetime.now().month
-        if 3 <= current_month <= 5:
+        current_date = datetime.datetime.now()
+        current_month = current_date.month
+        current_day = current_date.day
+        
+        if (current_month == 3 and current_day >= 20) or (current_month == 4) or (current_month == 5) or (current_month == 6 and current_day < 21):
             return 'SPRING'
-        elif 6 <= current_month <= 8:
+        elif (current_month == 6 and current_day >= 21) or (current_month == 7) or (current_month == 8) or (current_month == 9 and current_day < 22):
             return 'SUMMER'
-        elif 9 <= current_month <= 11:
+        elif (current_month == 9 and current_day >= 22) or (current_month == 10) or (current_month == 11) or (current_month == 12 and current_day < 21):
             return 'AUTUMN'
         else:
             return 'WINTER'
