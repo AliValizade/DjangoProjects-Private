@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 from django.utils.safestring import mark_safe
 
-from cms.models import Disease
+from cms.models import Disease, Herb
 
 
 def validate_disease_count(value):
@@ -17,3 +17,10 @@ class DiseaseForm(forms.Form):
         required=True,
         validators=[validate_disease_count]
     )
+
+
+class HerbForm(forms.ModelForm):
+    class Meta:
+        model = Herb
+        fields = '__all__'
+

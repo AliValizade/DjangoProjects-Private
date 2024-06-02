@@ -1,9 +1,4 @@
 from django.db import models
-from django.db.models import Sum
-from profile import Profile
-from typing import Dict, List
-from django.http import  QueryDict
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse
 from django.forms import ValidationError
 from cms.manager import DiseaseManager, HerbManager
@@ -93,8 +88,8 @@ class JobScore(models.Model):
         (-100, 'قدغن است'),
     ]
     herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='job_scores')
-    job_type = models.CharField(max_length=14, choices=JOB_TYPE_CHOICES, default='EMPLOYEE')
-    score = models.IntegerField(choices=SCORE_CHOICES, default='0')
+    job_type = models.CharField(max_length=14, choices=JOB_TYPE_CHOICES)
+    score = models.IntegerField(choices=SCORE_CHOICES)
 
     def __str__(self) -> str:
         return f"{self.herb.name} - {self.score}"
@@ -117,8 +112,8 @@ class JobPollutionLevelScore(models.Model):
         (-100, 'قدغن است'),
     ]
     herb = models.ForeignKey(Herb, on_delete=models.CASCADE, related_name='pollution_scores')
-    job_pollution = models.CharField(max_length=14, choices=POLLUTION_LEVEL_CHOICES, default='MEDIUM')
-    score = models.IntegerField(choices=SCORE_CHOICES, default='0')
+    job_pollution = models.CharField(max_length=14, choices=POLLUTION_LEVEL_CHOICES)
+    score = models.IntegerField(choices=SCORE_CHOICES)
 
     def __str__(self) -> str:
         return f"{self.herb.name} - {self.score}"

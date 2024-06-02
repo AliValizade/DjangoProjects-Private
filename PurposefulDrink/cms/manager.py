@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from django.db.models import Sum, When, Case, IntegerField, Q, OuterRef, Subquery, F, Value
+from django.db.models import Sum, IntegerField, Q, OuterRef, Subquery, F, Value
 from django.apps import apps
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -8,7 +8,6 @@ from accounts.manager import UserManager
 
 
 class DiseaseManager(models.Manager):
-    
     def get_by_name(self, name):
         """
         Returns the Disease object with the given name and around disease additional names
@@ -73,13 +72,11 @@ class HerbManager(models.Manager):
             seasonal_scores__season=current_season,
             seasonal_scores__allergy_aggravator='YES'
         ).values_list('id', flat=True)
-        print("forbidden_by_allergy: ", list(forbidden_by_allergy))
 
         forbidden_by_season_score = self.get_queryset().filter(
             seasonal_scores__season=current_season,
             seasonal_scores__score=-100
         ).values_list('id', flat=True)
-        print("forbidden_by_season_score: ", list(forbidden_by_season_score))
 
         if user_seasonal_allergy == current_season:
             queryset = queryset.union(forbidden_by_allergy)
@@ -151,8 +148,6 @@ class HerbManager(models.Manager):
             job_pollution_score=Subquery(job_pollution_scores_subquery, output_field=IntegerField(), default=Value(0)),
             total_score=F('suitability_score') + F('seasonal_score') + F('job_type_score') + F('job_pollution_score')
         ).filter(total_score__gt=0)
-
-        print('suit-1: ==>', suitable_herbs)
 
         return self.get_final_recommendations(suitable_herbs)
 
