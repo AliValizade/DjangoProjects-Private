@@ -23,4 +23,5 @@ urlpatterns = [
     path('', include('cms.urls', namespace='cms')),
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('shop/', include('shop.urls', namespace='shop')),
+    path('blog/', include('blog.urls', namespace='blog'))
 ]
