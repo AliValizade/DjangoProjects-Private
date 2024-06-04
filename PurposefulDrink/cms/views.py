@@ -1,7 +1,54 @@
-from django.shortcuts import render
-from django.views import View
-# Create your views here.
+from rest_framework import viewsets
+from rest_framework.permissions import IsAdminUser
+from .models import Herb, Disease, AgeRange, Suitability, Post, Comment, Vote, SeasonalScore, JobScore, JobPollutionLevelScore
+from .serializers import HerbSerializer, DiseaseSerializer, AgeRangeSerializer, SuitabilitySerializer, PostSerializer, CommentSerializer, VoteSerializer, SeasonalScoreSerializer, JobScoreSerializer, JobPollutionLevelScoreSerializer
 
+class HerbViewSet(viewsets.ModelViewSet):
+    queryset = Herb.objects.all().prefetch_related('seasonal_scores', 'job_scores', 'pollution_scores', 'suitability_herb', 'inappropriate_age_ranges', 'interaction_herb')
+    serializer_class = HerbSerializer
+    permission_classes = [IsAdminUser]
 
-class CmsView(View):
-    pass
+class DiseaseViewSet(viewsets.ModelViewSet):
+    queryset = Disease.objects.all()
+    serializer_class = DiseaseSerializer
+    permission_classes = [IsAdminUser]
+
+class AgeRangeViewSet(viewsets.ModelViewSet):
+    queryset = AgeRange.objects.all()
+    serializer_class = AgeRangeSerializer
+    permission_classes = [IsAdminUser]
+
+class SuitabilityViewSet(viewsets.ModelViewSet):
+    queryset = Suitability.objects.select_related('herb', 'disease').all()
+    serializer_class = SuitabilitySerializer
+    permission_classes = [IsAdminUser]
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAdminUser]
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAdminUser]
+
+class VoteViewSet(viewsets.ModelViewSet):
+    queryset = Vote.objects.all()
+    serializer_class = VoteSerializer
+    permission_classes = [IsAdminUser]
+
+class SeasonalScoreViewSet(viewsets.ModelViewSet):
+    queryset = SeasonalScore.objects.select_related('herb').all()
+    serializer_class = SeasonalScoreSerializer
+    permission_classes = [IsAdminUser]
+
+class JobScoreViewSet(viewsets.ModelViewSet):
+    queryset = JobScore.objects.select_related('herb').all()
+    serializer_class = JobScoreSerializer
+    permission_classes = [IsAdminUser]
+
+class JobPollutionLevelScoreViewSet(viewsets.ModelViewSet):
+    queryset = JobPollutionLevelScore.objects.select_related('herb').all()
+    serializer_class = JobPollutionLevelScoreSerializer
+    permission_classes = [IsAdminUser]
