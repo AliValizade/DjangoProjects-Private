@@ -1,13 +1,13 @@
 import datetime
 from django.db import models
 from django.db.models import Sum, IntegerField, Q, OuterRef, Subquery, F, Value
-from django.apps import apps
 from django.core.exceptions import ObjectDoesNotExist
 
 from accounts.manager import UserManager
 
 
 class DiseaseManager(models.Manager):
+    
     def get_by_name(self, name):
         """
         Returns the Disease object with the given name and around disease additional names

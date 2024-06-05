@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser
-from .models import Herb, Disease, AgeRange, Suitability, Post, Comment, Vote, SeasonalScore, JobScore, JobPollutionLevelScore
-from .serializers import HerbSerializer, DiseaseSerializer, AgeRangeSerializer, SuitabilitySerializer, PostSerializer, CommentSerializer, VoteSerializer, SeasonalScoreSerializer, JobScoreSerializer, JobPollutionLevelScoreSerializer
+from ..models import Herb, Disease, AgeRange, Suitability, Post, SeasonalScore, JobScore, JobPollutionLevelScore
+from ..serializers import HerbSerializer, DiseaseSerializer, AgeRangeSerializer, SuitabilitySerializer, PostSerializer, SeasonalScoreSerializer, JobScoreSerializer, JobPollutionLevelScoreSerializer
 
 class HerbViewSet(viewsets.ModelViewSet):
     queryset = Herb.objects.all().prefetch_related('seasonal_scores', 'job_scores', 'pollution_scores', 'suitability_herb', 'inappropriate_age_ranges', 'interaction_herb')
@@ -28,15 +28,15 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = [IsAdminUser]
 
-class CommentViewSet(viewsets.ModelViewSet):
-    queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
-    permission_classes = [IsAdminUser]
+# class CommentViewSet(viewsets.ModelViewSet):
+#     queryset = Comment.objects.all()
+#     serializer_class = CommentSerializer
+#     permission_classes = [IsAdminUser]
 
-class VoteViewSet(viewsets.ModelViewSet):
-    queryset = Vote.objects.all()
-    serializer_class = VoteSerializer
-    permission_classes = [IsAdminUser]
+# class VoteViewSet(viewsets.ModelViewSet):
+#     queryset = Vote.objects.all()
+#     serializer_class = VoteSerializer
+#     permission_classes = [IsAdminUser]
 
 class SeasonalScoreViewSet(viewsets.ModelViewSet):
     queryset = SeasonalScore.objects.select_related('herb').all()

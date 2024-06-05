@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Herb, Disease, AgeRange, Suitability, Post, SeasonalScore, JobScore, JobPollutionLevelScore
+from ..models import Herb, Disease, AgeRange, Suitability, Post, SeasonalScore, JobScore, JobPollutionLevelScore
+
 
 class SeasonalScoreSerializer(serializers.ModelSerializer):
     class Meta:
@@ -108,4 +109,3 @@ class PostSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Vote
 #         fields = '__all__'
-

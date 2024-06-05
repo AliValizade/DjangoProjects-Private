@@ -4,6 +4,7 @@ from django.forms import ValidationError
 from cms.manager import DiseaseManager, HerbManager
 
 
+
 class Disease(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name="نام بیماری")
 
@@ -180,7 +181,7 @@ class Suitability(models.Model):
 
 
 class Post(models.Model):
-    author = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='uposts')
+    author = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='cms_uposts')
     body = models.TextField()
     slug = models.SlugField()
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -196,28 +197,28 @@ class Post(models.Model):
         return reverse("cms:post", kwargs={"pk": self.pk, 'slug': self.slug})
     
 
-class Comment(models.Model):
-    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='ucomments')
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name= 'pcomments')
-    reply = models.ForeignKey('self', on_delete=models.CASCADE, related_name='rcomments')
-    is_reply = models.BooleanField(default=False)
-    body = models.TextField(max_length=400)
-    created = models.DateTimeField(auto_now_add=True)
+# class Comment(models.Model):
+#     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='cms_ucomments')
+#     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name= 'cms_pcomments')
+#     reply = models.ForeignKey('self', on_delete=models.CASCADE, related_name='cms_rcomments')
+#     is_reply = models.BooleanField(default=False)
+#     body = models.TextField(max_length=400)
+#     created = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f'{self.user} - {self.body[:30]}'
+#     def __str__(self):
+#         return f'{self.user} - {self.body[:30]}'
 
 
-class Vote(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='pvote')
-    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='uvote')
+# class Vote(models.Model):
+#     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='cms_pvote')
+#     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='cms_uvote')
 
-    def __str__(self) -> str:
-        return f'{self.user} liked {self.post.slug}'
+#     def __str__(self) -> str:
+#         return f'{self.user} liked {self.post.slug}'
     
-class Gallery(models.Model):
-    name = models.CharField(max_length=20)
-    image = models.ImageField()
+# class Gallery(models.Model):
+#     name = models.CharField(max_length=20)
+#     image = models.ImageField()
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
