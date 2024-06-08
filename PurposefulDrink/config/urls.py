@@ -44,9 +44,10 @@ urlpatterns = [
     path('cms/', include('cms.urls.admin_urls', namespace='cms_admin')),
     path('accounts/admin/', include('accounts.urls.admin_urls', namespace='accounts_admin')),
     path('accounts/user/', include('accounts.urls.user_urls', namespace='accounts_user')),
-    path('shop/', include('shop.urls', namespace='shop')),
+    # path('shop/', include('shop.urls', namespace='shop')),
     # path('blog/front', include('blog.urls.front', namespace='blog-front')),
     path('blog/admin/', include('blog.urls.admin', namespace='blog-admin')),
+    path('shop/api/', include('shop.urls.admin_urls', namespace='shop-admin')),
 ]
 
 if settings.DEBUG:

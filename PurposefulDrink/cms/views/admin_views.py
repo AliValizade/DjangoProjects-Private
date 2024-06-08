@@ -3,8 +3,8 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
-from ..models import Herb, Disease, AgeRange, Suitability, Post, SeasonalScore, JobScore, JobPollutionLevelScore
-from ..serializers import HerbSerializer, DiseaseSerializer, AgeRangeSerializer, SuitabilitySerializer, PostSerializer, SeasonalScoreSerializer, JobScoreSerializer, JobPollutionLevelScoreSerializer
+from ..models import Herb, Disease, AgeRange, Suitability, SeasonalScore, JobScore, JobPollutionLevelScore
+from ..serializers.admin_serializer import HerbSerializer, DiseaseSerializer, AgeRangeSerializer, SuitabilitySerializer, SeasonalScoreSerializer, JobScoreSerializer, JobPollutionLevelScoreSerializer
 
 
 class HerbViewSet(viewsets.ModelViewSet):
@@ -14,6 +14,7 @@ class HerbViewSet(viewsets.ModelViewSet):
     filter_backends = [SearchFilter, DjangoFilterBackend, OrderingFilter]
     ordering_fields = ['name', 'temperament']
     search_fields = ['name']
+    filterset_fields = ['temperament']
     # filterset_fields = ['']
 
 class DiseaseViewSet(viewsets.ModelViewSet):
@@ -33,21 +34,6 @@ class SuitabilityViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['disease_id', 'herb_id', 'score', 'alert_states']
     
-class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    permission_classes = [IsAdminUser]
-
-# class CommentViewSet(viewsets.ModelViewSet):
-#     queryset = Comment.objects.all()
-#     serializer_class = CommentSerializer
-#     permission_classes = [IsAdminUser]
-
-# class VoteViewSet(viewsets.ModelViewSet):
-#     queryset = Vote.objects.all()
-#     serializer_class = VoteSerializer
-#     permission_classes = [IsAdminUser]
-
 class SeasonalScoreViewSet(viewsets.ModelViewSet):
     queryset = SeasonalScore.objects.select_related('herb').all()
     serializer_class = SeasonalScoreSerializer

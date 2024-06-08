@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.core.exceptions import ValidationError
-from .models import AdditionalName, AgeRange, Herb, Disease, Suitability, Post, SeasonalScore, JobScore, JobPollutionLevelScore
+from .models import AdditionalName, AgeRange, Herb, Disease, Suitability, SeasonalScore, JobScore, JobPollutionLevelScore
 from .forms import HerbForm
 
 
@@ -93,6 +93,6 @@ class SeasonalScoreAdmin(admin.ModelAdmin):
 
 
 
-admin.site.register(Post)
+# admin.site.register(Post)
 # admin.site.register(Vote)
 # admin.site.register(Comment)
