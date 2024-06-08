@@ -98,6 +98,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = '__all__'
+        ref_name = "CmsPostSerializer"
 
 # class CommentSerializer(serializers.ModelSerializer):
 #     class Meta:

@@ -6,6 +6,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = '__all__'
+        ref_name = "BlogPostSerializer"
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
