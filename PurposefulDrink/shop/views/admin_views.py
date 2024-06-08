@@ -1,5 +1,8 @@
-# shop/api_views.py
 from rest_framework import generics
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
 from ..models import Order, OrderItems, DiscountCode, Product
 from ..serializers.admin_serializer import OrderSerializer, OrderItemsSerializer, DiscountCodeSerializer, ProductSerializer
 
@@ -30,7 +33,13 @@ class DiscountCodeDetailView(generics.RetrieveUpdateDestroyAPIView):
 class ProductListCreateView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [IsAdminUser]
+    filter_backends = [SearchFilter, DjangoFilterBackend, OrderingFilter]
+    ordering_fields = ['name', 'herbs']
+    search_fields = ['name']
+    filterset_fields = ['herbs', 'price', 'type']
 
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    
