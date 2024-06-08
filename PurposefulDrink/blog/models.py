@@ -1,8 +1,9 @@
 from django.db import models
 from django.urls import reverse
 # Create your models here.
+
 class Post(models.Model):
-    author = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='blog_uposts')
+    author = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='uposts')
     body = models.TextField()
     slug = models.SlugField()
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -19,9 +20,9 @@ class Post(models.Model):
     
 
 class Comment(models.Model):
-    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='blog_ucomments')
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name= 'blog_pcomments')
-    reply = models.ForeignKey('self', on_delete=models.CASCADE, related_name='blog_rcomments')
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='ucomments')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name= 'pcomments')
+    reply = models.ForeignKey('self', on_delete=models.CASCADE, related_name='rcomments')
     is_reply = models.BooleanField(default=False)
     body = models.TextField(max_length=400)
     created = models.DateTimeField(auto_now_add=True)
@@ -31,9 +32,10 @@ class Comment(models.Model):
 
 
 class Vote(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='blog_pvote')
-    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='blog_uvote')
-
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='pvote')
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='uvote')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
     def __str__(self) -> str:
         return f'{self.user} liked {self.post.slug}'
     

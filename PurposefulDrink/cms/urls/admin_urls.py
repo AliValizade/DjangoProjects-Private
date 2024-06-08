@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from ..views.admin_views import HerbViewSet, DiseaseViewSet, AgeRangeViewSet, SuitabilityViewSet, PostViewSet, SeasonalScoreViewSet, JobScoreViewSet, JobPollutionLevelScoreViewSet
 
+app_name = 'cms_admin'
 
 router = DefaultRouter()
 router.register(r'herbs', HerbViewSet)
