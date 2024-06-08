@@ -11,28 +11,28 @@ class SuitabilityInline(admin.TabularInline):
     search_fields = ("disease",)
     # raw_id_fields = ('disease',) 
     extra = 1 
-    min_num = 1
-    validate_min = True    
+    # min_num = 1
+    # validate_min = True    
 
 
 class SeasonalScoreInline(admin.TabularInline):
     model = SeasonalScore
     extra = 0
-    min_num = 1
-    validate_min = True
+    # min_num = 1
+    # validate_min = True
 
 class JobScoreInline(admin.TabularInline):
     model = JobScore
     extra = 0
-    min_num = 1
-    validate_min = True
+    # min_num = 1
+    # validate_min = True
 
 
 class JobPollutionLevelScoreInline(admin.TabularInline):
     model = JobPollutionLevelScore
     extra = 0
-    min_num = 1
-    validate_min = True
+    # min_num = 1
+    # validate_min = True
 
 
 @admin.register(Herb)
@@ -41,17 +41,17 @@ class HerbAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'herb_flavor', 'temperament', 'get_inappropriate_age_ranges', 'get_interaction_herbs', )
     inlines = [SuitabilityInline, SeasonalScoreInline, JobScoreInline, JobPollutionLevelScoreInline]  
 
-    def save_model(self, request, obj, form, change):
-        if not obj.pk:
-            super().save_model(request, obj, form, change)
-        if not obj.suitability_herb.exists():
-            form.add_error(None, ValidationError('حداقل یک سطر برای "Suitability" باید وارد شود.'))
-        if not obj.seasonal_scores.exists():
-            form.add_error(None, ValidationError('حداقل یک سطر برای "SeasonalScore" باید وارد شود.'))
-        if not obj.job_scores.exists():
-            form.add_error(None, ValidationError('حداقل یک سطر برای "JobScore" باید وارد شود.'))
-        if not obj.pollution_scores.exists():
-            form.add_error(None, ValidationError('حداقل یک سطر برای "JobPollutionLevelScore" باید وارد شود.'))
+    # def save_model(self, request, obj, form, change):
+    #     if not obj.pk:
+    #         super().save_model(request, obj, form, change)
+    #     if not obj.suitability_herb.exists():
+    #         form.add_error(None, ValidationError('حداقل یک سطر برای "Suitability" باید وارد شود.'))
+    #     if not obj.seasonal_scores.exists():
+    #         form.add_error(None, ValidationError('حداقل یک سطر برای "SeasonalScore" باید وارد شود.'))
+    #     if not obj.job_scores.exists():
+    #         form.add_error(None, ValidationError('حداقل یک سطر برای "JobScore" باید وارد شود.'))
+    #     if not obj.pollution_scores.exists():
+    #         form.add_error(None, ValidationError('حداقل یک سطر برای "JobPollutionLevelScore" باید وارد شود.'))
    
     def get_inappropriate_age_ranges(self, obj):
         return ", ".join([str(range) for range in obj.inappropriate_age_ranges.all()])
