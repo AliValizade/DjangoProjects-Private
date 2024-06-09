@@ -1,37 +1,25 @@
-from rest_framework import generics
+from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
-from ..models import Order, OrderItems, DiscountCode, Product
-from ..serializers.admin_serializer import OrderSerializer, OrderItemsSerializer, DiscountCodeSerializer, ProductSerializer
+from ..models import Order, OrderItems, DiscountCode, Product, Cart, CartItem
+from ..serializers.admin_serializer import OrderSerializer, OrderItemsSerializer, DiscountCodeSerializer, ProductSerializer, CartSerializer, CartItemSerializer
 
-class OrderListCreateView(generics.ListCreateAPIView):
+class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
-class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
-
-class OrderItemsListCreateView(generics.ListCreateAPIView):
+class OrderItemsViewSet(viewsets.ModelViewSet):
     queryset = OrderItems.objects.all()
     serializer_class = OrderItemsSerializer
 
-class OrderItemsDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = OrderItems.objects.all()
-    serializer_class = OrderItemsSerializer
-
-class DiscountCodeListCreateView(generics.ListCreateAPIView):
+class DiscountCodeViewSet(viewsets.ModelViewSet):
     queryset = DiscountCode.objects.all()
     serializer_class = DiscountCodeSerializer
 
-class DiscountCodeDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = DiscountCode.objects.all()
-    serializer_class = DiscountCodeSerializer
-
-class ProductListCreateView(generics.ListCreateAPIView):
-    queryset = Product.objects.all()
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all().prefetch_related('cart_items')
     serializer_class = ProductSerializer
     permission_classes = [IsAdminUser]
     filter_backends = [SearchFilter, DjangoFilterBackend, OrderingFilter]
@@ -39,7 +27,14 @@ class ProductListCreateView(generics.ListCreateAPIView):
     search_fields = ['name']
     filterset_fields = ['herbs', 'price', 'type']
 
-class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+class CartViewSet(viewsets.ModelViewSet):
+    queryset = Cart.objects.all().prefetch_related('items__product')
+    serializer_class = CartSerializer
+    permission_classes = [IsAdminUser]
+
+class CartItemViewSet(viewsets.ModelViewSet):
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
