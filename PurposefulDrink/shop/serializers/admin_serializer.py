@@ -30,7 +30,7 @@ class CartProductSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'price', ]
 
 class CartItemSerializer(serializers.ModelSerializer):
-    product = CartProductSerializer()
+    product = CartProductSerializer(read_only=True)
     item_total = serializers.SerializerMethodField()
     class Meta:
         model = CartItem

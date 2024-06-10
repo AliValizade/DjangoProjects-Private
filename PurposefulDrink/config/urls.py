@@ -47,7 +47,7 @@ urlpatterns = [
     # path('shop/', include('shop.urls', namespace='shop')),
     # path('blog/front', include('blog.urls.front', namespace='blog-front')),
     path('blog/admin/', include('blog.urls.admin', namespace='blog-admin')),
-    path('shop/', include('shop.urls.admin_urls', namespace='shop_admin')),
+    path('shop/api/', include('shop.urls.admin_urls', namespace='shop_admin')),
 ]
 
 if settings.DEBUG:
