@@ -4,7 +4,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from ..models import Order, OrderItems, DiscountCode, Product, Cart, CartItem
-from ..serializers.admin_serializer import OrderSerializer, OrderItemsSerializer, DiscountCodeSerializer, ProductSerializer, CartSerializer, CartItemSerializer
+from ..serializers.admin_serializer import OrderSerializer, OrderItemsSerializer, DiscountCodeSerializer, ProductSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
@@ -36,9 +36,15 @@ class CartViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]
 
 class CartItemViewSet(viewsets.ModelViewSet):
-    # queryset = CartItem.objects.all()
-    serializer_class = CartItemSerializer
-
     def get_queryset(self):
         cart_pk = self.kwargs['cart_pk']
         return CartItem.objects.select_related('product').filter(cart_id=cart_pk).all()
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return AddCartItemSerializer
+        return CartItemSerializer
+
+    def get_serializer_context(self):
+        return {'cart_pk': self.kwargs['cart_pk']}
+    

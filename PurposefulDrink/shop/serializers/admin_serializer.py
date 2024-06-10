@@ -29,6 +29,15 @@ class CartProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['id', 'name', 'price', ]
 
+class AddCartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'quantity', ]
+
+    def create(self, validated_data):
+        cart_id = self.context['cart_pk']
+        return CartItem.objects.create(cart_id=cart_id, **validated_data)
+
 class CartItemSerializer(serializers.ModelSerializer):
     product = CartProductSerializer(read_only=True)
     item_total = serializers.SerializerMethodField()
