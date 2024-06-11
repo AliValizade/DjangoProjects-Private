@@ -1,3 +1,4 @@
+from django.db.models import Prefetch
 from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -7,9 +8,16 @@ from ..models import Order, OrderItems, DiscountCode, Product, Cart, CartItem
 from ..serializers.admin_serializer import OrderSerializer, OrderItemsSerializer, DiscountCodeSerializer, ProductSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
 
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
+    def get_queryset(self):
+        return Order.objects.prefetch_related(
+            Prefetch(
+                'items',
+                queryset=OrderItems.objects.select_related('product'),
+            )
+        ).all()
+    
 class OrderItemsViewSet(viewsets.ModelViewSet):
     queryset = OrderItems.objects.all()
     serializer_class = OrderItemsSerializer

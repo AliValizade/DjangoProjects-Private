@@ -1,18 +1,6 @@
 from rest_framework import serializers
 from ..models import Order, OrderItems, DiscountCode, Product, Cart, CartItem
 
-class OrderItemsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderItems
-        fields = '__all__'
-
-class OrderSerializer(serializers.ModelSerializer):
-    items = OrderItemsSerializer(many=True, read_only=True)
-    total_price = serializers.ReadOnlyField(source='get_total_price')
-
-    class Meta:
-        model = Order
-        fields = '__all__'
 
 class DiscountCodeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,6 +11,24 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+
+class OrderProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'type', 'price']
+        
+class OrderItemsSerializer(serializers.ModelSerializer):
+    product = OrderProductSerializer()
+    class Meta:
+        model = OrderItems
+        fields = ['id', 'product', 'quantity', 'price']
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemsSerializer(many=True)
+    # total_price = serializers.ReadOnlyField(source='get_total_price')
+    class Meta:
+        model = Order
+        fields = ['id', 'user_id', 'paid', 'created', 'items']
 
 class CartProductSerializer(serializers.ModelSerializer):
     class Meta:

@@ -59,22 +59,20 @@ class OrderItems(models.Model):
     ('فله', 'فله')
     ]
     type = models.CharField(max_length=6, choices=TYPE_CHOICE, default='دمنوش')
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='item')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     price = models.PositiveBigIntegerField()
     quantity = models.PositiveIntegerField(default=1)
 
     def __str__(self):
-        return f'{self.order} - {self.herb}'
+        return f'{self.order} - {self.product}'
 
     def get_total_cost(self):
         return self.price * self.quantity
 
-
 class Cart(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4)
     created_at = models.DateTimeField(auto_now_add=True)
-
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
