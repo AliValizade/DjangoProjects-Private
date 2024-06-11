@@ -4,7 +4,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from ..models import Order, OrderItems, DiscountCode, Product, Cart, CartItem
-from ..serializers.admin_serializer import OrderSerializer, OrderItemsSerializer, DiscountCodeSerializer, ProductSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer
+from ..serializers.admin_serializer import OrderSerializer, OrderItemsSerializer, DiscountCodeSerializer, ProductSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
@@ -31,18 +31,21 @@ class ProductViewSet(viewsets.ModelViewSet):
         return {'request': self.request}
 
 class CartViewSet(viewsets.ModelViewSet):
-    queryset = Cart.objects.all().prefetch_related('items__product')
     serializer_class = CartSerializer
     permission_classes = [IsAdminUser]
+    queryset = Cart.objects.all().prefetch_related('items__product')
 
 class CartItemViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete']
     def get_queryset(self):
         cart_pk = self.kwargs['cart_pk']
         return CartItem.objects.select_related('product').filter(cart_id=cart_pk).all()
     
     def get_serializer_class(self):
-        if self.request.method == 'POST':
+        if self.request.method == 'POST':   
             return AddCartItemSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateCartItemSerializer
         return CartItemSerializer
 
     def get_serializer_context(self):
