@@ -6,12 +6,16 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from ..models import Order, OrderItems, DiscountCode, Product, Cart, CartItem
-from ..serializers.admin_serializer import OrderCreateSerializer, OrderSerializer, OrderItemsSerializer, DiscountCodeSerializer, ProductSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
+from ..serializers.admin_serializer import OrderCreateSerializer, OrderSerializer, OrderItemsSerializer, DiscountCodeSerializer, OrderUpdateSerializer, ProductSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
 
 class OrderViewSet(viewsets.ModelViewSet):
-    serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post', 'patch', 'delete', 'options', 'head']
 
+    def get_permissions(self):
+        if self.request.method in ['PATCH', 'DELETE']:
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
+    
     def get_queryset(self):
         queryset = Order.objects.prefetch_related(
             Prefetch(
@@ -29,6 +33,8 @@ class OrderViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return OrderCreateSerializer
+        if self.request.method == 'PATCH':
+            return OrderUpdateSerializer 
         return OrderSerializer
     
     def get_serializer_context(self):

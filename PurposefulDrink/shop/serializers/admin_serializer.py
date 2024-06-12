@@ -91,6 +91,11 @@ class CartSerializer(serializers.ModelSerializer):
         return sum([item.quantity * item.product.price for item in cart.items.all()])
 
 
+class OrderUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['paid', 'discount']
+
 class OrderCreateSerializer(serializers.Serializer):
     cart_id = serializers.UUIDField()
 
