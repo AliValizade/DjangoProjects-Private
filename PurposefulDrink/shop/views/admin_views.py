@@ -1,22 +1,48 @@
 from django.db.models import Prefetch
+from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from ..models import Order, OrderItems, DiscountCode, Product, Cart, CartItem
-from ..serializers.admin_serializer import OrderSerializer, OrderItemsSerializer, DiscountCodeSerializer, ProductSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
+from ..serializers.admin_serializer import OrderCreateSerializer, OrderSerializer, OrderItemsSerializer, DiscountCodeSerializer, ProductSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Order.objects.prefetch_related(
+        queryset = Order.objects.prefetch_related(
             Prefetch(
                 'items',
                 queryset=OrderItems.objects.select_related('product'),
             )
-        ).all()
+        ).select_related('user').all()
+
+        user = self.request.user
+
+        if user.is_staff:
+            return queryset
+        return queryset.filter(user_id=user.id)
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return OrderCreateSerializer
+        return OrderSerializer
+    
+    def get_serializer_context(self):
+        return {'user_id': self.request.user.id}
+    
+    def create(self, request, *args, **kwargs):
+        create_order_serializer = OrderCreateSerializer(data=request.data, context={'user_id': self.request.user.id})
+        create_order_serializer.is_valid(raise_exception=True)
+        created_order = create_order_serializer.save()
+
+        serializer = OrderSerializer(created_order)
+
+        return Response(serializer.data)
+    
     
 class OrderItemsViewSet(viewsets.ModelViewSet):
     queryset = OrderItems.objects.all()
