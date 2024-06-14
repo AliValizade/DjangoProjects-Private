@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Order, OrderItems, DiscountCode, Product, Cart, CartItem
+from .models import Order, OrderItems, DiscountCode, Product
 # Register your models here.
 
 class OrderItemInline(admin.TabularInline):
@@ -28,13 +28,13 @@ class ProductAdmin(admin.ModelAdmin):
     display_herbs.short_description = 'Herbs'
 
 
-class CartItemInline(admin.TabularInline):
-    model = CartItem
-    fields = ['id', 'product', 'quantity', ]
-    extra = 0
-    min_num = 1
+# class CartItemInline(admin.TabularInline):
+#     model = CartItem
+#     fields = ['id', 'product', 'quantity', ]
+#     extra = 0
+#     min_num = 1
 
-@admin.register(Cart)
-class CartAdmin(admin.ModelAdmin):
-    list_display = ('id', 'created_at', )
-    inlines = (CartItemInline, )
+# @admin.register(Cart)
+# class CartAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'created_at', )
+#     inlines = (CartItemInline, )
